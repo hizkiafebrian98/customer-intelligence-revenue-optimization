@@ -1,20 +1,36 @@
 # Python
 __pycache__/
 *.py[cod]
+*.egg-info/
+build/
+dist/
 .venv/
 venv/
+env/
 
 # Jupyter
 .ipynb_checkpoints/
 
 # Data
 data/raw/*
-data/processed/*
 !data/raw/.gitkeep
+
+data/processed/*
 !data/processed/.gitkeep
 
-# Environment variables
+# Environment variables and credentials
 .env
+.env.*
+!.env.example
+
+# Logs and temporary files
+*.log
+*.tmp
+
+# Testing and tooling
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
 
 # IDE
 .vscode/
