@@ -1,2 +1,4 @@
 pandas
 openpyxl
+SQLAlchemy==2.0.48
+psycopg[binary]==3.3.2
