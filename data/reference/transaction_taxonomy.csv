@@ -1,0 +1,17 @@
+transaction_category,merchandise_revenue_treatment,customer_level_eligible,qualifying_purchase,notes
+merchandise_candidate,include_positive,True,True,Identified-customer merchandise transactions
+anonymous_merchandise_candidate,include_positive,False,False,Merchandise transactions without Customer ID
+merchandise_cancellation_candidate,include_negative,True,False,Identified-customer merchandise cancellations
+anonymous_merchandise_cancellation_candidate,include_negative,False,False,Anonymous merchandise cancellations
+delivery_charge,separate,False,False,Delivery-related charges
+packing_charge,separate,False,False,Packing-related charges
+zero_price_activity,exclude,True,False,Zero-price activity; not a paid purchase
+operational_adjustment_candidate,exclude,False,False,Potential operational or inventory adjustments
+manual_transaction,separate,False,False,Manual transactions with unclear accounting meaning
+discount_related_transaction,separate,False,False,Discount-related records; accounting treatment unresolved
+financial_adjustment,separate,False,False,Financial adjustment records
+bank_charge,separate,False,False,Bank charge records
+platform_fee_candidate,separate,False,False,Potential platform-related fees
+bad_debt_adjustment,separate,False,False,Bad-debt financial adjustments
+sample_transaction,exclude,False,False,Sample-related transactions
+test_transaction_candidate,exclude,False,False,Potential test transactions
