@@ -64,7 +64,8 @@ customer-intelligence-revenue-optimization/
 │   ├── 03_database_integration.ipynb
 │   ├── 04_exploratory_data_analysis.ipynb
 │   ├── 05_customer_analytics_and_segmentation.ipynb
-│   └── 06_feature_engineering_and_target_construction.ipynb
+│   ├── 06_feature_engineering_and_target_construction.ipynb
+│   └── 07_predictive_model_development.ipynb
 ├── sql/
 │   ├── schema.sql
 │   ├── data_quality.sql
@@ -84,7 +85,8 @@ customer-intelligence-revenue-optimization/
 │   ├── database_engineering_and_sql_analytics.md
 │   ├── exploratory_data_analysis.md
 │   ├── customer_analytics_and_segmentation.md
-│   └── feature_engineering_and_target_construction.md
+│   ├── feature_engineering_and_target_construction.md
+│   └── predictive_model_development.md
 ├── requirements.txt
 ├── pyproject.toml
 └── README.md
@@ -261,12 +263,70 @@ Customer observations may overlap across partitions because the prediction objec
 
 Documentation: `docs/feature_engineering_and_target_construction.md`
 
+### Phase 8 — Predictive Model Development
+
+**Status: Completed**
+
+Developed and compared classification models to estimate whether an eligible customer would make at least one qualifying purchase within the next 90 days.
+
+Four candidate algorithms were evaluated:
+
+- Logistic Regression
+- Decision Tree
+- Random Forest
+- Gradient Boosting
+
+Key accomplishments:
+
+- Established Logistic Regression as the initial interpretable baseline using standardized features.
+- Developed tree-based models to investigate nonlinear purchasing behavior.
+- Compared models using ROC-AUC, PR-AUC, accuracy, precision, recall, F1-score, and confusion matrices.
+- Examined training-validation performance differences to assess generalization and potential overfitting.
+- Investigated Logistic Regression coefficients and Gradient Boosting feature importance.
+- Tuned Logistic Regression regularization and Gradient Boosting hyperparameters using the validation partition.
+- Compared the tuned candidate models and selected a primary model and an alternative.
+- Evaluated classification thresholds to examine precision-recall trade-offs and operational prediction volumes.
+
+**Selected findings:**
+
+- Tuned Logistic Regression achieved validation ROC-AUC 0.7472, PR-AUC 0.7190, and F1-score 0.6442.
+- Tuned Gradient Boosting achieved validation ROC-AUC 0.7476, PR-AUC 0.7215, and F1-score 0.6406.
+- Historical purchase frequency and monetary value were the strongest predictive signals across the two examined models.
+- Logistic Regression was selected as the primary candidate because of its slightly stronger recall and F1-score, alongside its simpler and more interpretable structure.
+- Gradient Boosting was retained as an alternative candidate because of its marginally higher ROC-AUC and PR-AUC.
+
+**Selected primary model:**
+
+- Algorithm: Logistic Regression
+- Regularization parameter: `C=0.01`
+- Classification threshold: `0.50`
+- Scaling: StandardScaler
+- Predictors: five Phase 7 baseline features
+
+**Threshold analysis:**
+
+| Threshold | Precision | Recall | F1-score |
+|---:|---:|---:|---:|
+| 0.40 | 51.59% | 83.17% | 0.6368 |
+| 0.50 | 58.26% | 72.03% | 0.6442 |
+| 0.60 | 67.08% | 59.14% | 0.6286 |
+
+The threshold of 0.50 was retained as the primary operating threshold because it achieved the highest F1-score among the tested thresholds. A threshold of 0.40 was retained as a higher-recall alternative.
+
+The test partition was not used for model training, hyperparameter tuning, or threshold selection. Final test-set evaluation and model explainability remain part of Phase 9.
+
+**Key outputs:**
+
+- `notebooks/07_predictive_model_development.ipynb`
+- `docs/predictive_model_development.md`
+
+Documentation: `docs/predictive_model_development.md`
+
 ### Upcoming Phases
 
 | Phase | Focus | Status |
 |---|---|---|
-| 8 | Predictive Model Development | Next |
-| 9 | Model Evaluation & Explainability | Planned |
+| 9 | Model Evaluation & Explainability | Next |
 | 10 | Business Impact & Retention Prioritization | Planned |
 | 11 | Streamlit Application | Planned |
 | 12 | Testing, Refactoring & Documentation | Planned |
@@ -289,6 +349,7 @@ Consequently:
 - Gross qualifying purchase revenue does not automatically account for cancellations.
 - Temporal variation in purchasing behavior must be considered when evaluating predictive performance.
 - Retention return on investment cannot be established without additional cost and margin assumptions.
+- Validation performance does not establish final generalization performance; the untouched test partition must be evaluated separately.
 
 These limitations will be addressed throughout the analytical workflow.
 
