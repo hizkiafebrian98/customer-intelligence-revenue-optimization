@@ -44,7 +44,7 @@ The original workbook is not included in this repository. Download it from the o
 | Statistical analysis | Python statistical libraries |
 | Visualization | Matplotlib, Seaborn |
 | Machine learning | Scikit-learn, XGBoost |
-| Model explainability | SHAP |
+| Model explainability | Logistic Regression coefficients, odds ratios |
 | Application | Streamlit |
 | Version control | Git, GitHub |
 
@@ -65,7 +65,8 @@ customer-intelligence-revenue-optimization/
 │   ├── 04_exploratory_data_analysis.ipynb
 │   ├── 05_customer_analytics_and_segmentation.ipynb
 │   ├── 06_feature_engineering_and_target_construction.ipynb
-│   └── 07_predictive_model_development.ipynb
+│   ├── 07_predictive_model_development.ipynb
+│   └── 08_model_evaluation_and_explainability.ipynb
 ├── sql/
 │   ├── schema.sql
 │   ├── data_quality.sql
@@ -86,7 +87,8 @@ customer-intelligence-revenue-optimization/
 │   ├── exploratory_data_analysis.md
 │   ├── customer_analytics_and_segmentation.md
 │   ├── feature_engineering_and_target_construction.md
-│   └── predictive_model_development.md
+│   ├── predictive_model_development.md
+│   └── model_evaluation_and_explainability.md
 ├── requirements.txt
 ├── pyproject.toml
 └── README.md
@@ -313,7 +315,7 @@ Key accomplishments:
 
 The threshold of 0.50 was retained as the primary operating threshold because it achieved the highest F1-score among the tested thresholds. A threshold of 0.40 was retained as a higher-recall alternative.
 
-The test partition was not used for model training, hyperparameter tuning, or threshold selection. Final test-set evaluation and model explainability remain part of Phase 9.
+The test partition was not used for model training, hyperparameter tuning, or threshold selection. Final test-set evaluation and model explainability were addressed in Phase 9.
 
 **Key outputs:**
 
@@ -322,12 +324,74 @@ The test partition was not used for model training, hyperparameter tuning, or th
 
 Documentation: `docs/predictive_model_development.md`
 
+### Phase 9 — Model Evaluation & Explainability
+
+**Status: Completed**
+
+Evaluated the selected Tuned Logistic Regression model using the untouched chronological test partition and investigated its predictive behavior, feature associations, and temporal generalization.
+
+Key accomplishments:
+
+- Reconstructed the selected Phase 8 Logistic Regression pipeline using training data only.
+- Reproduced the Phase 8 validation metrics to four decimal places before final test evaluation.
+- Evaluated the frozen model on 5,534 test observations using ROC-AUC, PR-AUC, accuracy, precision, recall, specificity, F1-score, and Brier score.
+- Examined the test confusion matrix and classification errors.
+- Evaluated probability calibration using a ten-bin quantile-based calibration curve.
+- Interpreted standardized Logistic Regression coefficients and odds ratios.
+- Compared false positives, false negatives, true positives, and true negatives to investigate prediction error patterns.
+- Compared model performance across training, validation, and test partitions.
+- Documented temporal variation, calibration limitations, and constraints on model interpretation.
+
+**Final test-set performance:**
+
+| Metric | Test Result |
+|---|---:|
+| ROC-AUC | 0.7413 |
+| PR-AUC | 0.8139 |
+| Accuracy | 0.6765 |
+| Precision | 0.7555 |
+| Recall | 0.6565 |
+| Specificity | 0.7044 |
+| F1-score | 0.7026 |
+| Brier score | 0.2031 |
+
+**Test confusion matrix:**
+
+| | Predicted non-repeat | Predicted repeat |
+|---|---:|---:|
+| Actual non-repeat | 1,630 | 684 |
+| Actual repeat | 1,106 | 2,114 |
+
+**Selected explainability findings:**
+
+- `log1p_frequency` was the strongest positive predictive feature, with a standardized coefficient of 0.5922 and odds ratio of 1.8080.
+- `log1p_monetary` had a positive coefficient of 0.2601 and odds ratio of 1.2971.
+- `log1p_unique_products` had a positive coefficient of 0.1737 and odds ratio of 1.1897.
+- `recency_days` had a negative coefficient of -0.0886 and odds ratio of 0.9152.
+- `log1p_cancellation_value` had a small positive coefficient of 0.0481 and odds ratio of 1.0493.
+
+The coefficients represent conditional predictive associations rather than causal effects.
+
+**Temporal generalization findings:**
+
+- ROC-AUC remained relatively stable across training (0.7267), validation (0.7472), and test (0.7413).
+- Test precision was higher than validation precision (75.55% versus 58.26%), while test recall was lower (65.65% versus 72.03%).
+- Positive-class prevalence varied across the three partitions, influencing the interpretation of precision and PR-AUC.
+- The test calibration curve indicated systematic underestimation of observed repeat-purchase rates.
+- The model demonstrated reasonably stable temporal ranking performance, but classification behavior and probability calibration varied across periods.
+
+**Key outputs:**
+
+- `notebooks/08_model_evaluation_and_explainability.ipynb`
+- `docs/model_evaluation_and_explainability.md`
+
+Documentation: `docs/model_evaluation_and_explainability.md`
+
 ### Upcoming Phases
 
 | Phase | Focus | Status |
 |---|---|---|
-| 9 | Model Evaluation & Explainability | Next |
-| 10 | Business Impact & Retention Prioritization | Planned |
+| 10 | Business Impact & Retention Prioritization | Next |
 | 11 | Streamlit Application | Planned |
 | 12 | Testing, Refactoring & Documentation | Planned |
 | 13 | Final Portfolio Presentation | Planned |
@@ -348,8 +412,10 @@ Consequently:
 - Cancellation records must not automatically be treated as confirmed matches to original purchases.
 - Gross qualifying purchase revenue does not automatically account for cancellations.
 - Temporal variation in purchasing behavior must be considered when evaluating predictive performance.
+- Test-set performance has been evaluated, but it does not establish production readiness or performance on entirely unseen customers.
+- Test calibration indicated systematic underestimation of observed repeat-purchase rates; predicted probabilities should therefore be interpreted cautiously.
 - Retention return on investment cannot be established without additional cost and margin assumptions.
-- Validation performance does not establish final generalization performance; the untouched test partition must be evaluated separately.
+- Classification thresholds should not be treated as financially optimal without evidence about intervention costs and business outcomes.
 
 These limitations will be addressed throughout the analytical workflow.
 
