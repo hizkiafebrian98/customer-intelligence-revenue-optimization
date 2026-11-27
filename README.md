@@ -42,18 +42,18 @@ The original workbook is not included in this repository. Download it from the o
 | Data extraction | Excel, OpenPyXL |
 | Database engineering | PostgreSQL, SQLAlchemy, Psycopg |
 | Statistical analysis | Python statistical libraries |
-| Visualization | Matplotlib, Seaborn |
+| Visualization | Matplotlib, Seaborn, Plotly |
 | Machine learning | Scikit-learn |
 | Model explainability | Logistic Regression coefficients, odds ratios |
 | Application | Streamlit |
 | Version control | Git, GitHub |
 
-Some technologies are planned for later phases and have not yet been implemented.
-
 ## Project Structure
 
 ```text
 customer-intelligence-revenue-optimization/
+├── .streamlit/
+│   └── config.toml
 ├── data/
 │   ├── raw/
 │   ├── processed/
@@ -73,12 +73,32 @@ customer-intelligence-revenue-optimization/
 │   ├── data_quality.sql
 │   └── customer_analysis.sql
 ├── src/
-│   └── data/
-│       ├── extract.py
-│       ├── transform.py
-│       ├── validate.py
-│       └── load.py
+│   ├── data/
+│   │   ├── extract.py
+│   │   ├── transform.py
+│   │   ├── validate.py
+│   │   └── load.py
+│   └── model/
+│       ├── train_model.py
+│       └── build_retention_priorities.py
+├── models/
+│   └── selected_logistic_regression.joblib
 ├── app/
+│   ├── Home.py
+│   ├── pages/
+│   │   ├── 1_Executive_Overview.py
+│   │   ├── 2_Customer_Segmentation.py
+│   │   ├── 3_Repeat_Purchase_Prediction.py
+│   │   └── 4_Retention_Prioritization.py
+│   ├── components/
+│   │   ├── __init__.py
+│   │   ├── metrics.py
+│   │   └── charts.py
+│   └── utils/
+│       ├── __init__.py
+│       ├── data_loader.py
+│       ├── data_validation.py
+│       └── model_loader.py
 ├── tests/
 ├── reports/
 ├── docs/
@@ -90,7 +110,8 @@ customer-intelligence-revenue-optimization/
 │   ├── feature_engineering_and_target_construction.md
 │   ├── predictive_model_development.md
 │   ├── model_evaluation_and_explainability.md
-│   └── business_impact_and_retention_prioritization.md
+│   ├── business_impact_and_retention_prioritization.md
+│   └── streamlit_application.md
 ├── requirements.txt
 ├── pyproject.toml
 └── README.md
@@ -442,12 +463,74 @@ These recommendations are analytical hypotheses, not proven interventions. Histo
 
 Documentation: `docs/business_impact_and_retention_prioritization.md`
 
+### Phase 11 — Streamlit Application
+
+**Status: Completed**
+
+Developed an interactive Streamlit application to present the analytical outputs from the preceding project phases through a unified business intelligence interface.
+
+Key accomplishments:
+
+- Established a modular application architecture separating navigation, analytical pages, reusable components, and data-access utilities.
+- Implemented centralized multipage navigation using Streamlit's `st.navigation()` and `st.Page()`.
+- Developed four interactive application pages:
+  - Executive Overview
+  - Customer Segmentation
+  - Repeat-Purchase Prediction
+  - Retention Prioritization
+- Integrated processed Parquet and CSV analytical datasets using reusable data-loading functions.
+- Implemented file-existence, required-column, and non-empty dataset validation.
+- Integrated the selected Logistic Regression pipeline through a reusable model-loading component.
+- Developed reusable KPI metric cards and shared Plotly chart styling.
+- Implemented interactive filters, customer-level exploration, predictive threshold adjustment, and retention prioritization scenarios.
+- Applied a consistent Modern Enterprise BI visual theme using Inter typography, a navy and blue color palette, custom KPI cards, and Material Symbols icons.
+- Created application documentation covering architecture, page functionality, data integration, execution, and methodological limitations.
+
+**Application pages:**
+
+| Page | Primary functionality |
+|---|---|
+| Executive Overview | Customer metrics, revenue distribution, RFM performance, and business observations |
+| Customer Segmentation | RFM analysis, customer exploration, and K-Means clustering |
+| Repeat-Purchase Prediction | Model performance, threshold analysis, confusion matrix, and customer predictions |
+| Retention Prioritization | Priority groups, historical monetary-value distribution, scenarios, and customer exploration |
+
+**Application architecture:**
+
+- `app/Home.py` — central navigation controller.
+- `app/pages/` — four analytical application pages.
+- `app/components/metrics.py` — reusable KPI card component.
+- `app/components/charts.py` — shared Plotly chart styling and color mappings.
+- `app/utils/data_loader.py` — processed dataset loading and caching.
+- `app/utils/data_validation.py` — dataset availability and structure validation.
+- `app/utils/model_loader.py` — selected model loading and caching.
+
+**Key outputs:**
+
+- `app/Home.py`
+- `app/pages/`
+- `app/components/`
+- `app/utils/`
+- `.streamlit/config.toml`
+- `docs/streamlit_application.md`
+
+**Running the application:**
+
+Activate the project environment and execute the following command from the repository root:
+
+```powershell
+python -s -m streamlit run app/Home.py
+```
+
+The application requires the processed analytical datasets and selected model artifact to be available locally.
+
+Documentation: `docs/streamlit_application.md`
+
 ### Upcoming Phases
 
 | Phase | Focus | Status |
 |---|---|---|
-| 11 | Streamlit Application | Planned |
-| 12 | Testing, Refactoring & Documentation | Planned |
+| 12 | Testing, Refactoring & Documentation | Next |
 | 13 | Final Portfolio Presentation | Planned |
 
 ## Important Analytical Considerations

@@ -1,4 +1,10 @@
-pandas
+numpy==2.5.5
+pandas==3.1.1
 openpyxl
 SQLAlchemy==2.0.48
 psycopg[binary]==3.3.2
+scikit-learn==1.9.1
+pyarrow==26.0.1
+joblib==1.6.0
+streamlit==1.67.0
+plotly==7.2.0
