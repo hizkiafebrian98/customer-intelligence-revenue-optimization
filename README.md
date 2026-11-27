@@ -1,6 +1,6 @@
 # Customer Intelligence & Revenue Optimization
 
-An applied data science project focused on understanding retail customer purchasing behavior, identifying customers at risk of becoming inactive, and supporting data-driven retention prioritization.
+An applied data science project focused on understanding retail customer purchasing behavior, identifying customers with lower repeat-purchase propensity, and supporting data-driven retention prioritization.
 
 ## Project Overview
 
@@ -9,14 +9,14 @@ Retail businesses generate large volumes of transaction data, but transaction re
 This project develops a customer intelligence solution using historical retail transactions to investigate:
 
 - Which customers generate the most revenue?
-- Which customers are becoming inactive?
+- Which customers exhibit signs of purchasing inactivity?
 - What purchasing behaviors are associated with customer inactivity?
 - Can future repeat-purchase behavior be predicted using historical purchasing behavior?
 - Which customer characteristics contribute most to predictive outcomes?
-- How much historical revenue is associated with customers identified as at risk?
+- How is historical purchase value distributed among customers with different repeat-purchase outcomes?
 - Which customer segments should receive retention attention first?
 
-The project combines data engineering, exploratory data analysis, customer analytics, statistical methods, and machine learning into an end-to-end analytical workflow.
+The project combines data engineering, exploratory data analysis, customer analytics, statistical methods, machine learning, and business-oriented prioritization into an end-to-end analytical workflow.
 
 ## Dataset
 
@@ -43,7 +43,7 @@ The original workbook is not included in this repository. Download it from the o
 | Database engineering | PostgreSQL, SQLAlchemy, Psycopg |
 | Statistical analysis | Python statistical libraries |
 | Visualization | Matplotlib, Seaborn |
-| Machine learning | Scikit-learn, XGBoost |
+| Machine learning | Scikit-learn |
 | Model explainability | Logistic Regression coefficients, odds ratios |
 | Application | Streamlit |
 | Version control | Git, GitHub |
@@ -66,7 +66,8 @@ customer-intelligence-revenue-optimization/
 │   ├── 05_customer_analytics_and_segmentation.ipynb
 │   ├── 06_feature_engineering_and_target_construction.ipynb
 │   ├── 07_predictive_model_development.ipynb
-│   └── 08_model_evaluation_and_explainability.ipynb
+│   ├── 08_model_evaluation_and_explainability.ipynb
+│   └── 09_business_impact_and_retention_prioritization.ipynb
 ├── sql/
 │   ├── schema.sql
 │   ├── data_quality.sql
@@ -88,7 +89,8 @@ customer-intelligence-revenue-optimization/
 │   ├── customer_analytics_and_segmentation.md
 │   ├── feature_engineering_and_target_construction.md
 │   ├── predictive_model_development.md
-│   └── model_evaluation_and_explainability.md
+│   ├── model_evaluation_and_explainability.md
+│   └── business_impact_and_retention_prioritization.md
 ├── requirements.txt
 ├── pyproject.toml
 └── README.md
@@ -387,11 +389,63 @@ The coefficients represent conditional predictive associations rather than causa
 
 Documentation: `docs/model_evaluation_and_explainability.md`
 
+### Phase 10 — Business Impact & Retention Prioritization
+
+**Status: Completed**
+
+Translated predictive model outputs into a customer prioritization framework by combining predicted repeat-purchase probability with historical monetary value.
+
+Key accomplishments:
+
+- Reconstructed the selected Phase 9 Logistic Regression model and generated predictions for the held-out test partition.
+- Created a customer-level prioritization dataset containing 2,968 unique customers, retaining each customer's latest available test-period snapshot.
+- Reconstructed historical qualifying purchase value from the preceding 180-day feature window.
+- Developed a 2 × 2 priority matrix using median predicted probability (0.4791) and median historical monetary value (454.18).
+- Profiled priority groups using snapshot-specific recency, frequency, and monetary metrics, avoiding the use of full-history customer segments that could introduce future information.
+- Evaluated the groups retrospectively using actual 90-day repeat-purchase outcomes.
+- Compared four customer coverage scenarios to examine trade-offs between customer coverage, predicted propensity, and historical monetary value.
+- Examined historical monetary value associated with customers who did and did not repeat purchase.
+- Developed differentiated retention and engagement recommendations for each priority group.
+- Documented analytical limitations, including the absence of intervention outcomes, campaign costs, profit margins, and causal uplift estimates.
+
+**Priority groups:**
+
+| Priority group | Customers | Customer share | Historical value share | Actual repeat rate |
+|---|---:|---:|---:|---:|
+| P1 — High value, low propensity | 228 | 7.68% | 4.49% | 41.67% |
+| P2 — High value, high propensity | 1,256 | 42.32% | 85.64% | 78.90% |
+| P3 — Low value, low propensity | 1,256 | 42.32% | 7.76% | 40.61% |
+| P4 — Low value, high propensity | 228 | 7.68% | 2.11% | 57.89% |
+
+**Selected findings:**
+
+- P1 represented a focused group of 228 customers with relatively high historical monetary value and lower predicted repeat-purchase propensity.
+- P1 had the highest proportion of group historical monetary value associated with non-repeat outcomes (59.60%).
+- P3 had a similar non-repeat historical value share (57.16%), but contained a larger population of 1,256 customers with lower historical monetary value per customer.
+- P2 represented 85.64% of total historical monetary value, making it important for relationship maintenance despite its relatively high repeat-purchase propensity.
+- A high-value customer coverage scenario containing P1 and P2 covered 50% of customers and represented 90.13% of historical monetary value.
+- A broad risk coverage scenario containing P1 and P3 covered 50% of customers but represented 12.25% of historical monetary value.
+
+**Business recommendations:**
+
+- P1: Focused retention review and potentially personalized engagement.
+- P3: Scalable, lower-cost engagement initiatives.
+- P2: Relationship maintenance and ongoing monitoring.
+- P4: Routine engagement and potential growth opportunities.
+
+These recommendations are analytical hypotheses, not proven interventions. Historical monetary value is not lifetime value, profit, revenue at risk, or recoverable revenue. The analysis does not establish campaign effectiveness, incremental repeat purchases, or retention ROI.
+
+**Key outputs:**
+
+- `notebooks/09_business_impact_and_retention_prioritization.ipynb`
+- `docs/business_impact_and_retention_prioritization.md`
+
+Documentation: `docs/business_impact_and_retention_prioritization.md`
+
 ### Upcoming Phases
 
 | Phase | Focus | Status |
 |---|---|---|
-| 10 | Business Impact & Retention Prioritization | Next |
 | 11 | Streamlit Application | Planned |
 | 12 | Testing, Refactoring & Documentation | Planned |
 | 13 | Final Portfolio Presentation | Planned |
@@ -407,17 +461,17 @@ Consequently:
 - Inactivity must be defined using an explicit observation window.
 - Predictive labels must account for the dataset's temporal coverage.
 - The repeat-purchase target represents future purchasing behavior within a defined 90-day window, not permanent customer retention or churn.
-- Historical revenue must not be interpreted as profit.
+- Historical revenue must not be interpreted as profit or customer lifetime value.
 - Predictive associations must not be interpreted as causal relationships.
 - Cancellation records must not automatically be treated as confirmed matches to original purchases.
 - Gross qualifying purchase revenue does not automatically account for cancellations.
 - Temporal variation in purchasing behavior must be considered when evaluating predictive performance.
 - Test-set performance has been evaluated, but it does not establish production readiness or performance on entirely unseen customers.
 - Test calibration indicated systematic underestimation of observed repeat-purchase rates; predicted probabilities should therefore be interpreted cautiously.
-- Retention return on investment cannot be established without additional cost and margin assumptions.
+- Retention return on investment cannot be established without additional cost, margin, and intervention-effectiveness information.
 - Classification thresholds should not be treated as financially optimal without evidence about intervention costs and business outcomes.
 
-These limitations will be addressed throughout the analytical workflow.
+These limitations are considered throughout the analytical workflow.
 
 ## Repository and Data Policy
 
