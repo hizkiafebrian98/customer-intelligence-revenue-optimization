@@ -11,7 +11,7 @@ This project develops a customer intelligence solution using historical retail t
 - Which customers generate the most revenue?
 - Which customers are becoming inactive?
 - What purchasing behaviors are associated with customer inactivity?
-- Can customer inactivity be predicted using historical purchasing behavior?
+- Can future repeat-purchase behavior be predicted using historical purchasing behavior?
 - Which customer characteristics contribute most to predictive outcomes?
 - How much historical revenue is associated with customers identified as at risk?
 - Which customer segments should receive retention attention first?
@@ -63,7 +63,8 @@ customer-intelligence-revenue-optimization/
 │   ├── 02_data_quality_assessment.ipynb
 │   ├── 03_database_integration.ipynb
 │   ├── 04_exploratory_data_analysis.ipynb
-│   └── 05_customer_analytics_and_segmentation.ipynb
+│   ├── 05_customer_analytics_and_segmentation.ipynb
+│   └── 06_feature_engineering_and_target_construction.ipynb
 ├── sql/
 │   ├── schema.sql
 │   ├── data_quality.sql
@@ -82,7 +83,8 @@ customer-intelligence-revenue-optimization/
 │   ├── data_cleaning_and_etl.md
 │   ├── database_engineering_and_sql_analytics.md
 │   ├── exploratory_data_analysis.md
-│   └── customer_analytics_and_segmentation.md
+│   ├── customer_analytics_and_segmentation.md
+│   └── feature_engineering_and_target_construction.md
 ├── requirements.txt
 ├── pyproject.toml
 └── README.md
@@ -207,12 +209,63 @@ Cancellation activity was examined as supplementary customer behavior. Cancellat
 
 Documentation: `docs/customer_analytics_and_segmentation.md`
 
+### Phase 7 — Feature Engineering & Target Construction
+
+**Status: Completed**
+
+Transformed historical transaction data into a supervised learning dataset for predicting customer repeat-purchase behavior.
+
+The prediction objective is to estimate whether an existing customer will make at least one qualifying purchase within the next 90 days, based on purchasing behavior during the preceding 180 days.
+
+Key accomplishments:
+
+- Defined the prediction unit, eligible customer population, historical feature window, and future target window.
+- Generated 16 monthly customer snapshots covering June 2010 through September 2011.
+- Constructed 47,933 customer-snapshot observations representing 5,212 distinct customers.
+- Engineered historical purchasing features, including recency, frequency, monetary value, purchase-line count, product variety, and average invoice value.
+- Engineered separate historical cancellation features to capture cancellation activity without automatically subtracting cancellations from gross purchase revenue.
+- Investigated extreme customer observations and preserved legitimate high-value purchasing behavior.
+- Applied `log1p` transformations to strongly right-skewed features.
+- Examined Spearman correlations to identify redundant features and establish an initial five-feature baseline.
+- Constructed the binary target `repeat_purchase_90d`, representing whether a qualifying purchase occurred during the subsequent 90-day period.
+- Reconciled target counts against the preliminary snapshot audit across all 16 snapshots.
+- Designed chronological training, validation, and test partitions with temporal embargo periods to prevent target-window overlap across partitions.
+- Completed feature integrity, cancellation feature, and temporal leakage validation checks.
+- Saved the complete modeling dataset and temporal partition summary.
+
+**Selected findings:**
+
+- The modeling dataset contains 47,933 customer-snapshot observations and 5,212 distinct customers.
+- The target contains 23,533 positive observations (49.10%) and 24,400 negative observations (50.90%).
+- The initial baseline uses five features: `recency_days`, `log1p_frequency`, `log1p_monetary`, `log1p_unique_products`, and `log1p_cancellation_value`.
+- The training partition contains 17,119 observations, the validation partition 9,985, and the test partition 5,534.
+- An additional 15,295 observations are retained in temporal embargo periods and excluded from the selected modeling partitions.
+- All 16 snapshot-level target reconciliations matched, and all 24 feature, cancellation, and final leakage validation checks passed.
+
+**Temporal partition design:**
+
+| Partition | Snapshot Period | Observations | Positive Rate |
+|---|---|---:|---:|
+| Training | June–November 2010 | 17,119 | 54.51% |
+| Validation | February–April 2011 | 9,985 | 41.96% |
+| Test | August–September 2011 | 5,534 | 58.19% |
+| Embargo | December 2010–July 2011 | 15,295 | 44.40% |
+
+Customer observations may overlap across partitions because the prediction objective concerns future purchasing behavior among existing customers. Temporal embargo periods prevent target-window overlap between the selected modeling partitions.
+
+**Key outputs:**
+
+- `notebooks/06_feature_engineering_and_target_construction.ipynb`
+- `data/processed/customer_purchase_propensity_dataset.parquet`
+- `data/processed/temporal_partition_summary.csv`
+
+Documentation: `docs/feature_engineering_and_target_construction.md`
+
 ### Upcoming Phases
 
 | Phase | Focus | Status |
 |---|---|---|
-| 7 | Feature Engineering & Target Construction | Next |
-| 8 | Predictive Model Development | Planned |
+| 8 | Predictive Model Development | Next |
 | 9 | Model Evaluation & Explainability | Planned |
 | 10 | Business Impact & Retention Prioritization | Planned |
 | 11 | Streamlit Application | Planned |
@@ -221,7 +274,7 @@ Documentation: `docs/customer_analytics_and_segmentation.md`
 
 ## Important Analytical Considerations
 
-This project investigates behavioral purchase inactivity, not subscription cancellation or permanent customer churn.
+This project investigates behavioral purchase inactivity and repeat-purchase propensity, not subscription cancellation or permanent customer churn.
 
 The dataset does not contain explicit churn labels, customer demographics, product costs, profit margins, or retention campaign costs.
 
@@ -229,9 +282,12 @@ Consequently:
 
 - Inactivity must be defined using an explicit observation window.
 - Predictive labels must account for the dataset's temporal coverage.
+- The repeat-purchase target represents future purchasing behavior within a defined 90-day window, not permanent customer retention or churn.
 - Historical revenue must not be interpreted as profit.
 - Predictive associations must not be interpreted as causal relationships.
 - Cancellation records must not automatically be treated as confirmed matches to original purchases.
+- Gross qualifying purchase revenue does not automatically account for cancellations.
+- Temporal variation in purchasing behavior must be considered when evaluating predictive performance.
 - Retention return on investment cannot be established without additional cost and margin assumptions.
 
 These limitations will be addressed throughout the analytical workflow.
@@ -240,7 +296,7 @@ These limitations will be addressed throughout the analytical workflow.
 
 Source code, notebooks, documentation, and reference files are maintained in Git.
 
-Raw and processed datasets are excluded from version control because of their size and data management considerations. The original dataset can be obtained from the official UCI repository.
+Raw and processed datasets are excluded from version control because of their size and data management considerations. The original dataset can be obtained from the official UCI repository. Processed analytical datasets and modeling outputs can be reproduced by running the relevant notebooks and scripts.
 
 ## Author
 
