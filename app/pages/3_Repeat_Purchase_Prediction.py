@@ -1,4 +1,3 @@
-
 from app.utils.model_loader import load_selected_model
 
 import pandas as pd
@@ -16,16 +15,8 @@ from utils.data_loader import load_purchase_propensity_dataset
 from app.components.metrics import display_metric_row
 from app.components.charts import apply_chart_theme
 
+from app.config import FEATURES, TARGET
 
-FEATURES = [
-    "recency_days",
-    "log1p_frequency",
-    "log1p_monetary",
-    "log1p_unique_products",
-    "log1p_cancellation_value",
-]
-
-TARGET = "repeat_purchase_90d"
 
 
 # Load data and model

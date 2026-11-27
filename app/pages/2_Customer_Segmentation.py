@@ -83,11 +83,17 @@ display_metric_row([
     },
     {
         "label": "Median Recency",
-        "value": f"{median_recency:.0f} days",
+        "value": (
+            f"{median_recency:.0f} days"
+            if customer_count > 0 else "N/A"
+        ),
     },
     {
         "label": "Median Purchase Frequency",
-        "value": f"{median_frequency:.1f}",
+        "value": (
+            f"{median_frequency:.1f}"
+            if customer_count > 0 else "N/A"
+        ),
     },
 ])
 
@@ -95,145 +101,153 @@ display_metric_row([
 st.divider()
 
 
-# Customer behavior visualization
-st.subheader("Customer Behavior")
+if filtered_customers.empty:
 
-left_col, right_col = st.columns(2)
+    st.info(
+        "No customers match the selected RFM segment. "
+        "Try selecting a different segment."
+    )
 
-with left_col:
-    fig_recency = px.histogram(
+else:
+
+    # Customer behavior visualization
+    st.subheader("Customer Behavior")
+
+    left_col, right_col = st.columns(2)
+
+    with left_col:
+        fig_recency = px.histogram(
+            filtered_customers,
+            x="recency",
+            nbins=30,
+            title="Customer Recency Distribution",
+            labels={
+                "recency": "Recency (days)",
+                "count": "Number of Customers",
+            },
+        )
+
+        fig_recency = apply_chart_theme(fig_recency)
+
+        st.plotly_chart(
+            fig_recency,
+            use_container_width=True,
+        )
+
+    with right_col:
+        fig_frequency = px.histogram(
+            filtered_customers,
+            x="frequency",
+            nbins=30,
+            title="Purchase Frequency Distribution",
+            labels={
+                "frequency": "Number of Invoices",
+                "count": "Number of Customers",
+            },
+        )
+
+        fig_frequency = apply_chart_theme(fig_frequency)
+
+        st.plotly_chart(
+            fig_frequency,
+            use_container_width=True,
+        )
+
+
+    # Customer-level scatter plot
+    st.subheader("Customer Value and Engagement")
+
+    fig_scatter = px.scatter(
         filtered_customers,
         x="recency",
-        nbins=30,
-        title="Customer Recency Distribution",
+        y="monetary",
+        color="rfm_segment",
+        hover_data=[
+            "Customer ID",
+            "frequency",
+            "unique_products",
+            "cancellation_value",
+        ],
+        log_y=True,
+        title="Recency vs. Qualifying Purchase Value",
         labels={
             "recency": "Recency (days)",
-            "count": "Number of Customers",
+            "monetary": "Qualifying Purchase Value (£, log scale)",
+            "rfm_segment": "RFM Segment",
         },
     )
 
-    fig_recency = apply_chart_theme(fig_recency)
+    fig_scatter = apply_chart_theme(fig_scatter)
 
     st.plotly_chart(
-        fig_recency,
+        fig_scatter,
         use_container_width=True,
     )
 
 
-with right_col:
-    fig_frequency = px.histogram(
-        filtered_customers,
-        x="frequency",
-        nbins=30,
-        title="Purchase Frequency Distribution",
-        labels={
-            "frequency": "Number of Invoices",
-            "count": "Number of Customers",
-        },
+    # Customer-level records
+    st.subheader("Customer Explorer")
+
+    st.markdown(
+        "Review individual customer metrics within the selected population."
     )
 
-    fig_frequency = apply_chart_theme(fig_frequency)
-
-    st.plotly_chart(
-        fig_frequency,
-        use_container_width=True,
-    )
-
-
-# Customer-level scatter plot
-st.subheader("Customer Value and Engagement")
-
-fig_scatter = px.scatter(
-    filtered_customers,
-    x="recency",
-    y="monetary",
-    color="rfm_segment",
-    hover_data=[
-        "Customer ID",
-        "frequency",
-        "unique_products",
-        "cancellation_value",
-    ],
-    log_y=True,
-    title="Recency vs. Qualifying Purchase Value",
-    labels={
-        "recency": "Recency (days)",
-        "monetary": "Qualifying Purchase Value (£, log scale)",
-        "rfm_segment": "RFM Segment",
-    },
-)
-
-fig_scatter = apply_chart_theme(fig_scatter)
-
-st.plotly_chart(
-    fig_scatter,
-    use_container_width=True,
-)
-
-
-# Customer-level records
-st.subheader("Customer Explorer")
-
-st.markdown(
-    "Review individual customer metrics within the selected population."
-)
-
-display_df = filtered_customers[
-    [
-        "Customer ID",
-        "rfm_segment",
-        "recency",
-        "frequency",
-        "monetary",
-        "unique_products",
-        "cancellation_value",
-        "cancellation_value_ratio",
-    ]
-].copy()
-
-display_df["Customer ID"] = (
-    display_df["Customer ID"].astype("Int64")
-)
-
-st.dataframe(
-    display_df.sort_values(
-        "monetary",
-        ascending=False,
-    ),
-    use_container_width=True,
-    hide_index=True,
-    column_config={
-        "Customer ID": st.column_config.NumberColumn(
+    display_df = filtered_customers[
+        [
             "Customer ID",
-            format="%d",
+            "rfm_segment",
+            "recency",
+            "frequency",
+            "monetary",
+            "unique_products",
+            "cancellation_value",
+            "cancellation_value_ratio",
+        ]
+    ].copy()
+
+    display_df["Customer ID"] = (
+        display_df["Customer ID"].astype("Int64")
+    )
+
+    st.dataframe(
+        display_df.sort_values(
+            "monetary",
+            ascending=False,
         ),
-        "rfm_segment": "RFM Segment",
-        "recency": st.column_config.NumberColumn(
-            "Recency (days)",
-            format="%d",
-        ),
-        "frequency": st.column_config.NumberColumn(
-            "Purchase Frequency",
-            format="%d",
-        ),
-        "monetary": st.column_config.NumberColumn(
-            "Qualifying Purchase Value",
-            format="£%.2f",
-        ),
-        "unique_products": st.column_config.NumberColumn(
-            "Unique Products",
-            format="%d",
-        ),
-        "cancellation_value": st.column_config.NumberColumn(
-            "Cancellation Value",
-            format="£%.2f",
-        ),
-        "cancellation_value_ratio": st.column_config.NumberColumn(
-            "Cancellation-to-Purchase-Value Ratio",
-            format="%.2f",
-        ),
-    },
-)
+        use_container_width=True,
+        hide_index=True,
+        column_config={
+            "Customer ID": st.column_config.NumberColumn(
+                "Customer ID",
+                format="%d",
+            ),
+            "rfm_segment": "RFM Segment",
+            "recency": st.column_config.NumberColumn(
+                "Recency (days)",
+                format="%d",
+            ),
+            "frequency": st.column_config.NumberColumn(
+                "Purchase Frequency",
+                format="%d",
+            ),
+            "monetary": st.column_config.NumberColumn(
+                "Qualifying Purchase Value",
+                format="£%.2f",
+            ),
+            "unique_products": st.column_config.NumberColumn(
+                "Unique Products",
+                format="%d",
+            ),
+            "cancellation_value": st.column_config.NumberColumn(
+                "Cancellation Value",
+                format="£%.2f",
+            ),
+            "cancellation_value_ratio": st.column_config.NumberColumn(
+                "Cancellation-to-Purchase-Value Ratio",
+                format="%.2f",
+            ),
+        },
+    )
 
 
 st.divider()

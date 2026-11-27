@@ -1,37 +1,90 @@
 # Customer Intelligence & Revenue Optimization
 
-An applied data science project focused on understanding retail customer purchasing behavior, identifying customers with lower repeat-purchase propensity, and supporting data-driven retention prioritization.
+An end-to-end data science project analyzing retail transaction data to understand customer purchasing behavior, identify repeat-purchase patterns, and develop data-driven retention prioritization strategies.
+
+The project combines data engineering, exploratory data analysis, customer segmentation, predictive modeling, model evaluation, and business-oriented analytics in an interactive Streamlit application.
+
+## Table of Contents
+
+1. [Project Overview](#project-overview)
+2. [Business Objectives](#business-objectives)
+3. [Dataset](#dataset)
+4. [Technology Stack](#technology-stack)
+5. [Project Structure](#project-structure)
+6. [Getting Started](#getting-started)
+7. [Data and Model Reproduction](#data-and-model-reproduction)
+8. [Streamlit Application](#streamlit-application)
+9. [Key Analytical Findings](#key-analytical-findings)
+10. [Model Performance](#model-performance)
+11. [Retention Prioritization](#retention-prioritization)
+12. [Limitations and Methodological Considerations](#limitations-and-methodological-considerations)
+13. [Project Progress](#project-progress)
+14. [References](#references)
+
+---
 
 ## Project Overview
 
-Retail businesses generate large volumes of transaction data, but transaction records alone do not provide a complete understanding of customer behavior.
+This project investigates customer purchasing behavior using the Online Retail II dataset.
 
-This project develops a customer intelligence solution using historical retail transactions to investigate:
+The objective is to transform raw retail transaction records into actionable customer intelligence through a reproducible analytical workflow.
 
-- Which customers generate the most revenue?
-- Which customers exhibit signs of purchasing inactivity?
-- What purchasing behaviors are associated with customer inactivity?
-- Can future repeat-purchase behavior be predicted using historical purchasing behavior?
-- Which customer characteristics contribute most to predictive outcomes?
-- How is historical purchase value distributed among customers with different repeat-purchase outcomes?
-- Which customer segments should receive retention attention first?
+The project focuses on three connected questions:
 
-The project combines data engineering, exploratory data analysis, customer analytics, statistical methods, machine learning, and business-oriented prioritization into an end-to-end analytical workflow.
+- **Customer intelligence:** Who are the customers, how do their purchasing patterns differ, and which customers have become inactive?
+- **Predictive analytics:** Which active customers are more or less likely to make another purchase within a defined future period?
+- **Retention prioritization:** How can customers be grouped into actionable priorities using predicted repeat-purchase probability and historical customer value?
+
+The project does not treat customer inactivity as proof of permanent churn. Instead, it examines observed purchasing behavior and future repeat-purchase propensity within explicitly defined observation windows.
+
+## Business Objectives
+
+The project aims to:
+
+1. Assess and prepare historical retail transaction data for analysis.
+2. Investigate customer purchasing patterns, revenue composition, and transaction behavior.
+3. Segment customers using Recency, Frequency, and Monetary (RFM) analysis.
+4. Develop a predictive model estimating repeat-purchase probability.
+5. Evaluate model performance using appropriate classification and probability metrics.
+6. Translate model predictions into customer retention priorities.
+7. Present analytical findings through an interactive business-facing application.
 
 ## Dataset
 
-**UCI Online Retail II**
+**Source:** UCI Machine Learning Repository — Online Retail II
 
-- Source: [UCI Machine Learning Repository](https://archive.ics.uci.edu/dataset/502/online+retail+ii)
-- Citation: Chen, D. (2012). *Online Retail II* [Dataset]. UCI Machine Learning Repository. https://doi.org/10.24432/C5CG6D.
-- License: CC BY 4.0
+The dataset contains transactions from a UK-based online retail business between December 2009 and December 2011.
+
 - Original records: 1,067,371 transaction line items
-- Original columns: 8
-- Period: December 2009 – December 2011
+- Original features: 8 columns
+- Period covered: December 2009 – December 2011
+- Format: Excel workbook containing two sheets
 
-The dataset contains transaction records from a UK-based, non-store online retailer.
+Original columns:
 
-The original workbook is not included in this repository. Download it from the official UCI source and place it in `data/raw/`.
+| Column | Description |
+|---|---|
+| Invoice | Invoice number |
+| StockCode | Product code |
+| Description | Product or transaction description |
+| Quantity | Quantity of items |
+| InvoiceDate | Transaction date and time |
+| Price | Unit price |
+| Customer ID | Customer identifier |
+| Country | Customer country |
+
+The original workbook is not included in the repository because of its size.
+
+Download the dataset from the [UCI Machine Learning Repository](https://doi.org/10.24432/C5CG6D) and place the workbook at:
+
+`data/raw/online_retail_II.xlsx`
+
+The project also relies on two reference files generated during data preparation:
+
+- `data/reference/description_mapping.csv`
+- `data/reference/transaction_taxonomy.csv`
+
+These files contain approved description mappings and transaction classification rules. They must be available when reproducing the data transformation workflow.
 
 ## Technology Stack
 
@@ -39,529 +92,490 @@ The original workbook is not included in this repository. Download it from the o
 |---|---|
 | Programming | Python |
 | Data manipulation | Pandas, NumPy |
-| Data extraction | Excel, OpenPyXL |
-| Database engineering | PostgreSQL, SQLAlchemy, Psycopg |
-| Statistical analysis | Python statistical libraries |
+| Data ingestion | OpenPyXL |
+| Database | PostgreSQL |
+| Database integration | SQLAlchemy, Psycopg |
+| Data analysis | Descriptive statistics, statistical analysis |
 | Visualization | Matplotlib, Seaborn, Plotly |
 | Machine learning | Scikit-learn |
-| Model explainability | Logistic Regression coefficients, odds ratios |
-| Application | Streamlit |
+| Predictive modeling | Logistic Regression, Gradient Boosting |
+| Model interpretation | Logistic Regression coefficients and odds ratios |
+| Model persistence | Joblib |
+| Interactive application | Streamlit |
+| Data storage | CSV, Parquet |
+| Development | Jupyter Notebook, VS Code |
 | Version control | Git, GitHub |
 
 ## Project Structure
 
 ```text
 customer-intelligence-revenue-optimization/
+│
 ├── .streamlit/
 │   └── config.toml
+│
+├── app/
+│   ├── Home.py
+│   ├── config.py
+│   │
+│   ├── pages/
+│   │   ├── 1_Executive_Overview.py
+│   │   ├── 2_Customer_Segmentation.py
+│   │   ├── 3_Repeat_Purchase_Prediction.py
+│   │   └── 4_Retention_Prioritization.py
+│   │
+│   ├── components/
+│   │   ├── __init__.py
+│   │   ├── charts.py
+│   │   └── metrics.py
+│   │
+│   └── utils/
+│       ├── __init__.py
+│       ├── data_loader.py
+│       ├── data_validation.py
+│       └── model_loader.py
+│
 ├── data/
 │   ├── raw/
-│   ├── processed/
-│   └── reference/
+│   ├── reference/
+│   │   ├── description_mapping.csv
+│   │   └── transaction_taxonomy.csv
+│   └── processed/
+│
+├── docs/
+│   ├── data_cleaning_and_etl.md
+│   ├── exploratory_data_analysis.md
+│   ├── customer_analytics_and_segmentation.md
+│   └── ...
+│
+├── models/
+│   └── selected_logistic_regression.joblib
+│
 ├── notebooks/
-│   ├── 01_data_understanding.ipynb
+│   ├── 01_business_understanding.ipynb
 │   ├── 02_data_quality_assessment.ipynb
-│   ├── 03_database_integration.ipynb
+│   ├── 03_database_engineering_and_sql_analytics.ipynb
 │   ├── 04_exploratory_data_analysis.ipynb
 │   ├── 05_customer_analytics_and_segmentation.ipynb
 │   ├── 06_feature_engineering_and_target_construction.ipynb
-│   ├── 07_predictive_model_development.ipynb
+│   ├── 07_model_development.ipynb
 │   ├── 08_model_evaluation_and_explainability.ipynb
 │   └── 09_business_impact_and_retention_prioritization.ipynb
+│
 ├── sql/
-│   ├── schema.sql
-│   ├── data_quality.sql
-│   └── customer_analysis.sql
+│
 ├── src/
 │   ├── data/
 │   │   ├── extract.py
 │   │   ├── transform.py
 │   │   ├── validate.py
 │   │   └── load.py
+│   │
 │   └── model/
 │       ├── train_model.py
 │       └── build_retention_priorities.py
-├── models/
-│   └── selected_logistic_regression.joblib
-├── app/
-│   ├── Home.py
-│   ├── pages/
-│   │   ├── 1_Executive_Overview.py
-│   │   ├── 2_Customer_Segmentation.py
-│   │   ├── 3_Repeat_Purchase_Prediction.py
-│   │   └── 4_Retention_Prioritization.py
-│   ├── components/
-│   │   ├── __init__.py
-│   │   ├── metrics.py
-│   │   └── charts.py
-│   └── utils/
-│       ├── __init__.py
-│       ├── data_loader.py
-│       ├── data_validation.py
-│       └── model_loader.py
+│
 ├── tests/
+│
 ├── reports/
-├── docs/
-│   ├── dataset_feasibility_assessment.md
-│   ├── data_cleaning_and_etl.md
-│   ├── database_engineering_and_sql_analytics.md
-│   ├── exploratory_data_analysis.md
-│   ├── customer_analytics_and_segmentation.md
-│   ├── feature_engineering_and_target_construction.md
-│   ├── predictive_model_development.md
-│   ├── model_evaluation_and_explainability.md
-│   ├── business_impact_and_retention_prioritization.md
-│   └── streamlit_application.md
+│
 ├── requirements.txt
 ├── pyproject.toml
+├── .gitignore
 └── README.md
 ```
 
-## Development Progress
+*The tree describes the principal project components. Local raw and processed data files are not necessarily tracked in Git.*
 
-### Phase 1 — Business Understanding & Problem Formulation
+## Getting Started
 
-**Status: Completed**
+### 1. Clone the repository
 
-Defined the business context, management questions, analytical objectives, and project scope.
+```powershell
+git clone https://github.com/hizkiafebrian98/customer-intelligence-revenue-optimization.git
 
-### Phase 2 — Dataset Acquisition & Feasibility Assessment
+cd customer-intelligence-revenue-optimization
+```
 
-**Status: Completed**
+### 2. Create and activate a Python environment
 
-Selected and assessed the UCI Online Retail II dataset, including its structure, coverage, data quality characteristics, and analytical limitations.
+The project was developed and tested using Python 3.12.
 
-Documentation: `docs/dataset_feasibility_assessment.md`
+Using Conda:
 
-### Phase 3 — Data Quality Assessment, Cleaning & ETL Preparation
+```powershell
+conda create -n retail-analytics python=3.12 -y
 
-**Status: Completed**
+conda activate retail-analytics
+```
 
-Key accomplishments:
+Alternatively, create a virtual environment:
 
-- Assessed missing values, duplicate records, transaction anomalies, and unusual quantities and prices.
-- Investigated and documented data cleaning decisions.
-- Developed a 16-category transaction classification taxonomy.
-- Created an approved product-description mapping for selected missing descriptions.
-- Excluded 34,335 excess exact duplicate records from the primary analytical dataset while preserving them in a separate audit dataset.
-- Produced a cleaned analytical dataset containing 1,033,036 records and 33 columns.
-- Implemented reusable extraction, transformation, and validation modules.
-- Reproduced the notebook transformation results exactly.
-- Passed all 29 automated data validation checks.
+```powershell
+python -m venv .venv
 
-The reusable ETL modules are located in `src/data/`.
+.\.venv\Scripts\Activate.ps1
+```
 
-Documentation: `docs/data_cleaning_and_etl.md`
+### 3. Install dependencies
 
-### Phase 4 — Database Engineering & SQL Analytics
+```powershell
+python -m pip install --upgrade pip
 
-**Status: Completed**
+python -m pip install -r requirements.txt
+```
 
-Key accomplishments:
+### 4. Prepare the dataset
 
-- Designed and implemented a PostgreSQL relational database.
-- Loaded the cleaned transaction dataset and supporting reference tables.
-- Implemented primary-key and referential integrity checks.
-- Reconciled source and database record counts and financial measures.
-- Developed SQL queries using joins, common table expressions, window functions, and conditional aggregation.
-- Investigated customer revenue contribution, purchase frequency, revenue concentration, recency, country performance, and cancellation-related patterns.
+Download the Online Retail II workbook from UCI and place it at:
 
-The database contains four tables:
+```text
+data/raw/online_retail_II.xlsx
+```
 
-- `retail_transactions`
-- `duplicate_transaction_audit`
-- `transaction_taxonomy`
-- `description_mapping`
+Ensure the required reference files are also available:
 
-Documentation: `docs/database_engineering_and_sql_analytics.md`
+```text
+data/reference/description_mapping.csv
+data/reference/transaction_taxonomy.csv
+```
 
-### Phase 5 — Exploratory Data Analysis
+### 5. Prepare analytical artifacts
 
-**Status: Completed**
+The processed datasets and model artifacts are required by the analytical notebooks and Streamlit application.
 
-Key accomplishments:
+Follow the data preparation and feature engineering workflow described below before launching the application.
 
-- Examined dataset structure, missing values, and numerical and categorical distributions.
-- Investigated quantity, price, and transaction-value relationships.
-- Analyzed monthly, weekday, and hourly transaction patterns.
-- Examined product performance, revenue concentration, and geographic differences.
-- Investigated extreme transactions, unusual prices, repeated invoice identifiers, and cancellation patterns.
-- Conducted purchase-to-cancellation candidate matching while documenting the limitations of source-level linkage.
-- Developed evidence-based findings and analytical limitations to inform subsequent customer analytics.
+## Data and Model Reproduction
 
-Documentation: `docs/exploratory_data_analysis.md`
+The project follows a sequential workflow. Later stages depend on artifacts generated in earlier stages.
 
-### Phase 6 — Customer Analytics & Segmentation
+### Stage 1 — Data preparation and ETL
 
-**Status: Completed**
+The data preparation scripts are located in:
 
-Constructed a customer-level analytical dataset containing 5,852 identified customers with at least one qualifying purchase.
+```text
+src/data/
+```
 
-Key accomplishments:
+They cover:
 
-- Defined customer-level analytical metrics, including Recency, Frequency, and Monetary value (RFM).
-- Analyzed customer purchasing behavior, frequency distributions, and revenue concentration.
-- Examined customer cancellation activity separately from qualifying purchases.
-- Developed six rule-based RFM segments:
-  - Champions
-  - Loyal customers
-  - Recent high-value
-  - At-risk valuable
-  - Hibernating
-  - Other customers
-- Applied K-Means clustering using transformed purchasing frequency and monetary values, alongside recency.
-- Evaluated candidate cluster counts using inertia and silhouette scores.
-- Selected a four-cluster solution based on a practical balance between cluster separation and business interpretability.
-- Compared RFM and K-Means segmentation results using Adjusted Rand Index and Normalized Mutual Information.
-- Developed segment profiles and preliminary retention prioritization recommendations.
+- Data extraction from the original workbook.
+- Transaction transformation and classification.
+- Data quality and output validation.
+- Database loading.
 
-**Selected findings:**
+The cleaning workflow uses the approved reference files in `data/reference/`.
 
-- The top 10% of customers contributed 63.90% of qualifying purchase revenue.
-- Customers with nine or more purchase invoices contributed 69.84% of qualifying purchase revenue.
-- RFM Champions represented 21.43% of customers and contributed 67.71% of qualifying purchase revenue.
-- The highest-value K-Means cluster represented 15.99% of customers and contributed 70.83% of qualifying purchase revenue.
-- RFM and K-Means produced partially overlapping but distinct customer groupings.
+The primary cleaned transaction artifacts include:
 
-Cancellation activity was examined as supplementary customer behavior. Cancellation-to-purchase-value ratios are descriptive indicators and should not be interpreted as verified return rates.
+```text
+data/processed/online_retail_clean.parquet
+data/processed/duplicate_audit.csv
+```
 
-**Key outputs:**
+The cleaned dataset contains 1,033,036 records, with 34,335 exact duplicate records retained separately for audit purposes.
 
-- `notebooks/05_customer_analytics_and_segmentation.ipynb`
-- `data/processed/customer_analytics.parquet`
-- `data/processed/rfm_segment_profile.csv`
-- `data/processed/kmeans_cluster_profile.csv`
-- `data/processed/rfm_cancellation_concentration.csv`
-- `data/processed/top_cancellation_customers_by_rfm.csv`
+See `docs/data_cleaning_and_etl.md` for the data treatment decisions and validation details.
 
-Documentation: `docs/customer_analytics_and_segmentation.md`
+### Stage 2 — Feature engineering and target construction
 
-### Phase 7 — Feature Engineering & Target Construction
+Run the notebook:
 
-**Status: Completed**
+```text
+notebooks/06_feature_engineering_and_target_construction.ipynb
+```
 
-Transformed historical transaction data into a supervised learning dataset for predicting customer repeat-purchase behavior.
+This notebook generates:
 
-The prediction objective is to estimate whether an existing customer will make at least one qualifying purchase within the next 90 days, based on purchasing behavior during the preceding 180 days.
+```text
+data/processed/customer_purchase_propensity_dataset.parquet
+```
 
-Key accomplishments:
+The resulting modeling dataset contains 47,933 customer-snapshot observations.
 
-- Defined the prediction unit, eligible customer population, historical feature window, and future target window.
-- Generated 16 monthly customer snapshots covering June 2010 through September 2011.
-- Constructed 47,933 customer-snapshot observations representing 5,212 distinct customers.
-- Engineered historical purchasing features, including recency, frequency, monetary value, purchase-line count, product variety, and average invoice value.
-- Engineered separate historical cancellation features to capture cancellation activity without automatically subtracting cancellations from gross purchase revenue.
-- Investigated extreme customer observations and preserved legitimate high-value purchasing behavior.
-- Applied `log1p` transformations to strongly right-skewed features.
-- Examined Spearman correlations to identify redundant features and establish an initial five-feature baseline.
-- Constructed the binary target `repeat_purchase_90d`, representing whether a qualifying purchase occurred during the subsequent 90-day period.
-- Reconciled target counts against the preliminary snapshot audit across all 16 snapshots.
-- Designed chronological training, validation, and test partitions with temporal embargo periods to prevent target-window overlap across partitions.
-- Completed feature integrity, cancellation feature, and temporal leakage validation checks.
-- Saved the complete modeling dataset and temporal partition summary.
+The target identifies whether a customer makes another qualifying purchase within the subsequent 90-day target window.
 
-**Selected findings:**
+### Stage 3 — Model training
 
-- The modeling dataset contains 47,933 customer-snapshot observations and 5,212 distinct customers.
-- The target contains 23,533 positive observations (49.10%) and 24,400 negative observations (50.90%).
-- The initial baseline uses five features: `recency_days`, `log1p_frequency`, `log1p_monetary`, `log1p_unique_products`, and `log1p_cancellation_value`.
-- The training partition contains 17,119 observations, the validation partition 9,985, and the test partition 5,534.
-- An additional 15,295 observations are retained in temporal embargo periods and excluded from the selected modeling partitions.
-- All 16 snapshot-level target reconciliations matched, and all 24 feature, cancellation, and final leakage validation checks passed.
+After generating the modeling dataset, execute:
 
-**Temporal partition design:**
+```powershell
+python src/model/train_model.py
+```
 
-| Partition | Snapshot Period | Observations | Positive Rate |
-|---|---|---:|---:|
-| Training | June–November 2010 | 17,119 | 54.51% |
-| Validation | February–April 2011 | 9,985 | 41.96% |
-| Test | August–September 2011 | 5,534 | 58.19% |
-| Embargo | December 2010–July 2011 | 15,295 | 44.40% |
+The training script:
 
-Customer observations may overlap across partitions because the prediction objective concerns future purchasing behavior among existing customers. Temporal embargo periods prevent target-window overlap between the selected modeling partitions.
+- Uses the training partition only.
+- Applies feature standardization.
+- Fits the selected Logistic Regression model.
+- Saves the fitted pipeline using Joblib.
 
-**Key outputs:**
+Output:
 
-- `notebooks/06_feature_engineering_and_target_construction.ipynb`
-- `data/processed/customer_purchase_propensity_dataset.parquet`
-- `data/processed/temporal_partition_summary.csv`
+```text
+models/selected_logistic_regression.joblib
+```
 
-Documentation: `docs/feature_engineering_and_target_construction.md`
+### Stage 4 — Retention-priority generation
 
-### Phase 8 — Predictive Model Development
+After model training, execute:
 
-**Status: Completed**
+```powershell
+python src/model/build_retention_priorities.py
+```
 
-Developed and compared classification models to estimate whether an eligible customer would make at least one qualifying purchase within the next 90 days.
+This script:
 
-Four candidate algorithms were evaluated:
+- Loads the fitted model.
+- Generates repeat-purchase probabilities for test-partition observations.
+- Reconstructs historical monetary values from their log-transformed representation.
+- Retains the latest test-period snapshot for each customer.
+- Assigns customers to four priority groups using median-based thresholds.
 
-- Logistic Regression
-- Decision Tree
-- Random Forest
-- Gradient Boosting
+Output:
 
-Key accomplishments:
+```text
+data/processed/retention_priorities.parquet
+```
 
-- Established Logistic Regression as the initial interpretable baseline using standardized features.
-- Developed tree-based models to investigate nonlinear purchasing behavior.
-- Compared models using ROC-AUC, PR-AUC, accuracy, precision, recall, F1-score, and confusion matrices.
-- Examined training-validation performance differences to assess generalization and potential overfitting.
-- Investigated Logistic Regression coefficients and Gradient Boosting feature importance.
-- Tuned Logistic Regression regularization and Gradient Boosting hyperparameters using the validation partition.
-- Compared the tuned candidate models and selected a primary model and an alternative.
-- Evaluated classification thresholds to examine precision-recall trade-offs and operational prediction volumes.
+The resulting dataset contains 2,968 unique customers.
 
-**Selected findings:**
+### Reproduction dependencies
 
-- Tuned Logistic Regression achieved validation ROC-AUC 0.7472, PR-AUC 0.7190, and F1-score 0.6442.
-- Tuned Gradient Boosting achieved validation ROC-AUC 0.7476, PR-AUC 0.7215, and F1-score 0.6406.
-- Historical purchase frequency and monetary value were the strongest predictive signals across the two examined models.
-- Logistic Regression was selected as the primary candidate because of its slightly stronger recall and F1-score, alongside its simpler and more interpretable structure.
-- Gradient Boosting was retained as an alternative candidate because of its marginally higher ROC-AUC and PR-AUC.
+The model and retention-priority scripts require the following files:
 
-**Selected primary model:**
+| Artifact | Generated by |
+|---|---|
+| `customer_purchase_propensity_dataset.parquet` | Phase 7 feature-engineering notebook |
+| `selected_logistic_regression.joblib` | `src/model/train_model.py` |
+| `retention_priorities.parquet` | `src/model/build_retention_priorities.py` |
 
-- Algorithm: Logistic Regression
-- Regularization parameter: `C=0.01`
-- Classification threshold: `0.50`
-- Scaling: StandardScaler
-- Predictors: five Phase 7 baseline features
+The complete workflow also requires the original workbook and the two reference files.
 
-**Threshold analysis:**
+## Streamlit Application
 
-| Threshold | Precision | Recall | F1-score |
-|---:|---:|---:|---:|
-| 0.40 | 51.59% | 83.17% | 0.6368 |
-| 0.50 | 58.26% | 72.03% | 0.6442 |
-| 0.60 | 67.08% | 59.14% | 0.6286 |
+The project includes an interactive Streamlit application designed to communicate analytical results and support customer-level exploration.
 
-The threshold of 0.50 was retained as the primary operating threshold because it achieved the highest F1-score among the tested thresholds. A threshold of 0.40 was retained as a higher-recall alternative.
+### Run the application
 
-The test partition was not used for model training, hyperparameter tuning, or threshold selection. Final test-set evaluation and model explainability were addressed in Phase 9.
+From the project root:
 
-**Key outputs:**
+```powershell
+python -m streamlit run app/Home.py
+```
 
-- `notebooks/07_predictive_model_development.ipynb`
-- `docs/predictive_model_development.md`
+The application requires the processed analytical datasets and fitted model artifact to be available in their expected local directories.
 
-Documentation: `docs/predictive_model_development.md`
+### Application pages
 
-### Phase 9 — Model Evaluation & Explainability
+#### 1. Executive Overview
 
-**Status: Completed**
+Provides a high-level summary of customer behavior, revenue patterns, segmentation, and repeat-purchase modeling.
 
-Evaluated the selected Tuned Logistic Regression model using the untouched chronological test partition and investigated its predictive behavior, feature associations, and temporal generalization.
+#### 2. Customer Segmentation
 
-Key accomplishments:
+Enables exploration of RFM customer segments and complementary K-Means clusters.
 
-- Reconstructed the selected Phase 8 Logistic Regression pipeline using training data only.
-- Reproduced the Phase 8 validation metrics to four decimal places before final test evaluation.
-- Evaluated the frozen model on 5,534 test observations using ROC-AUC, PR-AUC, accuracy, precision, recall, specificity, F1-score, and Brier score.
-- Examined the test confusion matrix and classification errors.
-- Evaluated probability calibration using a ten-bin quantile-based calibration curve.
-- Interpreted standardized Logistic Regression coefficients and odds ratios.
-- Compared false positives, false negatives, true positives, and true negatives to investigate prediction error patterns.
-- Compared model performance across training, validation, and test partitions.
-- Documented temporal variation, calibration limitations, and constraints on model interpretation.
+Users can filter customer groups and inspect their associated metrics and customer records.
 
-**Final test-set performance:**
+#### 3. Repeat-Purchase Prediction
 
-| Metric | Test Result |
+Provides an interactive interface for exploring predicted repeat-purchase probabilities.
+
+Users can adjust the classification threshold and examine its effect on classification metrics and the confusion matrix.
+
+#### 4. Retention Prioritization
+
+Presents the four customer priority groups, their historical monetary values, predicted probabilities, and recommended retention actions.
+
+Users can filter priority groups and explore individual customer records.
+
+## Key Analytical Findings
+
+### Data quality and preparation
+
+The original dataset contained 1,067,371 transaction line items.
+
+After the data quality and cleaning workflow:
+
+- 1,033,036 records remained in the primary cleaned dataset.
+- 34,335 exact duplicate records were separated into an audit dataset.
+- Missing customer identifiers were preserved rather than imputed.
+- Missing descriptions were partially recovered using an evidence-based StockCode mapping.
+- Transaction categories and analytical eligibility were established through explicit classification rules.
+
+### Exploratory data analysis
+
+The cleaned dataset covers December 1, 2009 to December 9, 2011.
+
+Key findings include:
+
+- Customer ID was missing in approximately 22.76% of original transaction records.
+- November was the strongest month for observed revenue in the dataset.
+- December 2011 represents only a partial month.
+- The United Kingdom accounted for approximately 85.42% of total merchandise revenue.
+- The five largest revenue-contributing countries represented approximately 95.02% of total merchandise revenue.
+- The top 100 products accounted for approximately 28.96% of merchandise revenue.
+
+Net merchandise revenue was approximately £18.92 million.
+
+### Customer segmentation
+
+Customer analytics identified 5,852 customers.
+
+RFM analysis produced six customer segments:
+
+| Segment | Customers | Revenue Share |
+|---|---:|---:|
+| At-risk valuable | 782 | 9.95% |
+| Champions | 1,254 | 67.71% |
+| Hibernating | 1,352 | 2.04% |
+| Loyal customers | 603 | 10.21% |
+| Other customers | 1,693 | 6.99% |
+| Recent high-value | 168 | 3.10% |
+
+RFM segmentation was used as the primary business-facing segmentation approach.
+
+K-Means clustering was implemented as a complementary unsupervised analysis. The selected four-cluster solution achieved a silhouette score of 0.3614.
+
+### Predictive modeling
+
+The predictive task estimates the probability of a qualifying repeat purchase within a 90-day target window.
+
+The selected model was Logistic Regression with standardized features.
+
+The five selected predictors were:
+
+- `recency_days`
+- `log1p_frequency`
+- `log1p_monetary`
+- `log1p_unique_products`
+- `log1p_cancellation_value`
+
+## Model Performance
+
+The selected Logistic Regression model achieved the following results.
+
+### Validation performance
+
+| Metric | Score |
+|---|---:|
+| ROC-AUC | 0.7472 |
+| PR-AUC | 0.7190 |
+| Accuracy | 0.6661 |
+| Precision | 0.5826 |
+| Recall | 0.7203 |
+| F1-score | 0.6442 |
+
+### Test performance
+
+| Metric | Score |
 |---|---:|
 | ROC-AUC | 0.7413 |
 | PR-AUC | 0.8139 |
 | Accuracy | 0.6765 |
 | Precision | 0.7555 |
 | Recall | 0.6565 |
-| Specificity | 0.7044 |
 | F1-score | 0.7026 |
+| Specificity | 0.7044 |
 | Brier score | 0.2031 |
 
-**Test confusion matrix:**
+The model was selected using validation performance. The test partition was reserved for final evaluation.
 
-| | Predicted non-repeat | Predicted repeat |
-|---|---:|---:|
-| Actual non-repeat | 1,630 | 684 |
-| Actual repeat | 1,106 | 2,114 |
+## Retention Prioritization
 
-**Selected explainability findings:**
+Customers were grouped using two dimensions:
 
-- `log1p_frequency` was the strongest positive predictive feature, with a standardized coefficient of 0.5922 and odds ratio of 1.8080.
-- `log1p_monetary` had a positive coefficient of 0.2601 and odds ratio of 1.2971.
-- `log1p_unique_products` had a positive coefficient of 0.1737 and odds ratio of 1.1897.
-- `recency_days` had a negative coefficient of -0.0886 and odds ratio of 0.9152.
-- `log1p_cancellation_value` had a small positive coefficient of 0.0481 and odds ratio of 1.0493.
+1. Historical monetary value.
+2. Predicted repeat-purchase probability.
 
-The coefficients represent conditional predictive associations rather than causal effects.
+Both dimensions use the median of the customer-level test population as their respective thresholds.
 
-**Temporal generalization findings:**
+| Priority | Customer Profile | Customers | Historical Monetary Value |
+|---|---|---:|---:|
+| P1 | High value, low predicted probability | 228 | £159,677.46 |
+| P2 | High value, high predicted probability | 1,256 | £3,043,099.13 |
+| P3 | Low value, low predicted probability | 1,256 | £275,587.57 |
+| P4 | Low value, high predicted probability | 228 | £75,012.29 |
 
-- ROC-AUC remained relatively stable across training (0.7267), validation (0.7472), and test (0.7413).
-- Test precision was higher than validation precision (75.55% versus 58.26%), while test recall was lower (65.65% versus 72.03%).
-- Positive-class prevalence varied across the three partitions, influencing the interpretation of precision and PR-AUC.
-- The test calibration curve indicated systematic underestimation of observed repeat-purchase rates.
-- The model demonstrated reasonably stable temporal ranking performance, but classification behavior and probability calibration varied across periods.
+### Priority interpretation
 
-**Key outputs:**
+- **P1:** Higher historical customer value combined with lower predicted repeat-purchase probability. Potentially suitable for targeted retention attention.
+- **P2:** Higher historical customer value and higher predicted repeat-purchase probability. Potentially suitable for loyalty and relationship-strengthening initiatives.
+- **P3:** Lower historical customer value and lower predicted repeat-purchase probability. Potentially suitable for lower-cost or selective engagement.
+- **P4:** Lower historical customer value and higher predicted repeat-purchase probability. Potentially suitable for scalable engagement strategies.
 
-- `notebooks/08_model_evaluation_and_explainability.ipynb`
-- `docs/model_evaluation_and_explainability.md`
+These groups are prioritization categories, not estimates of incremental campaign impact.
 
-Documentation: `docs/model_evaluation_and_explainability.md`
+## Limitations and Methodological Considerations
 
-### Phase 10 — Business Impact & Retention Prioritization
+Several limitations should be considered when interpreting the findings.
 
-**Status: Completed**
+### Dataset limitations
 
-Translated predictive model outputs into a customer prioritization framework by combining predicted repeat-purchase probability with historical monetary value.
+- The dataset represents historical transactions from a single online retail business.
+- Customer identifiers are missing for a substantial proportion of transaction records.
+- The dataset does not contain complete customer demographics, marketing exposure, or campaign response information.
+- The observation period ends on December 9, 2011.
 
-Key accomplishments:
+### Revenue interpretation
 
-- Reconstructed the selected Phase 9 Logistic Regression model and generated predictions for the held-out test partition.
-- Created a customer-level prioritization dataset containing 2,968 unique customers, retaining each customer's latest available test-period snapshot.
-- Reconstructed historical qualifying purchase value from the preceding 180-day feature window.
-- Developed a 2 × 2 priority matrix using median predicted probability (0.4791) and median historical monetary value (454.18).
-- Profiled priority groups using snapshot-specific recency, frequency, and monetary metrics, avoiding the use of full-history customer segments that could introduce future information.
-- Evaluated the groups retrospectively using actual 90-day repeat-purchase outcomes.
-- Compared four customer coverage scenarios to examine trade-offs between customer coverage, predicted propensity, and historical monetary value.
-- Examined historical monetary value associated with customers who did and did not repeat purchase.
-- Developed differentiated retention and engagement recommendations for each priority group.
-- Documented analytical limitations, including the absence of intervention outcomes, campaign costs, profit margins, and causal uplift estimates.
+Revenue figures represent historical transaction-based merchandise revenue under the project's classification rules.
 
-**Priority groups:**
+They should not be interpreted as profit, customer lifetime value, or incremental revenue.
 
-| Priority group | Customers | Customer share | Historical value share | Actual repeat rate |
-|---|---:|---:|---:|---:|
-| P1 — High value, low propensity | 228 | 7.68% | 4.49% | 41.67% |
-| P2 — High value, high propensity | 1,256 | 42.32% | 85.64% | 78.90% |
-| P3 — Low value, low propensity | 1,256 | 42.32% | 7.76% | 40.61% |
-| P4 — Low value, high propensity | 228 | 7.68% | 2.11% | 57.89% |
+### Customer inactivity
 
-**Selected findings:**
+A customer with a long period without a purchase is not necessarily permanently churned.
 
-- P1 represented a focused group of 228 customers with relatively high historical monetary value and lower predicted repeat-purchase propensity.
-- P1 had the highest proportion of group historical monetary value associated with non-repeat outcomes (59.60%).
-- P3 had a similar non-repeat historical value share (57.16%), but contained a larger population of 1,256 customers with lower historical monetary value per customer.
-- P2 represented 85.64% of total historical monetary value, making it important for relationship maintenance despite its relatively high repeat-purchase propensity.
-- A high-value customer coverage scenario containing P1 and P2 covered 50% of customers and represented 90.13% of historical monetary value.
-- A broad risk coverage scenario containing P1 and P3 covered 50% of customers but represented 12.25% of historical monetary value.
+The project uses observed inactivity and repeat-purchase behavior rather than claiming permanent customer attrition.
 
-**Business recommendations:**
+### Predictive modeling
 
-- P1: Focused retention review and potentially personalized engagement.
-- P3: Scalable, lower-cost engagement initiatives.
-- P2: Relationship maintenance and ongoing monitoring.
-- P4: Routine engagement and potential growth opportunities.
+- Model predictions represent estimated repeat-purchase probabilities within a defined target window.
+- Temporal partitions were used to evaluate model performance.
+- Customer overlap across temporal partitions is intentional; the evaluation does not establish generalization to entirely unseen customers.
+- Model coefficients indicate statistical associations, not causal effects.
+- Probability calibration showed that the model tends to underestimate observed repeat-purchase rates in parts of the probability range.
 
-These recommendations are analytical hypotheses, not proven interventions. Historical monetary value is not lifetime value, profit, revenue at risk, or recoverable revenue. The analysis does not establish campaign effectiveness, incremental repeat purchases, or retention ROI.
+### Retention prioritization
 
-**Key outputs:**
+- Priority thresholds are relative to the evaluated customer population.
+- Historical monetary value is not equivalent to customer lifetime value.
+- No causal campaign experiment was conducted.
+- Retention scenarios do not establish actual revenue saved, campaign ROI, or incremental business impact.
 
-- `notebooks/09_business_impact_and_retention_prioritization.ipynb`
-- `docs/business_impact_and_retention_prioritization.md`
+## Project Progress
 
-Documentation: `docs/business_impact_and_retention_prioritization.md`
+The project is organized into thirteen phases.
 
-### Phase 11 — Streamlit Application
-
-**Status: Completed**
-
-Developed an interactive Streamlit application to present the analytical outputs from the preceding project phases through a unified business intelligence interface.
-
-Key accomplishments:
-
-- Established a modular application architecture separating navigation, analytical pages, reusable components, and data-access utilities.
-- Implemented centralized multipage navigation using Streamlit's `st.navigation()` and `st.Page()`.
-- Developed four interactive application pages:
-  - Executive Overview
-  - Customer Segmentation
-  - Repeat-Purchase Prediction
-  - Retention Prioritization
-- Integrated processed Parquet and CSV analytical datasets using reusable data-loading functions.
-- Implemented file-existence, required-column, and non-empty dataset validation.
-- Integrated the selected Logistic Regression pipeline through a reusable model-loading component.
-- Developed reusable KPI metric cards and shared Plotly chart styling.
-- Implemented interactive filters, customer-level exploration, predictive threshold adjustment, and retention prioritization scenarios.
-- Applied a consistent Modern Enterprise BI visual theme using Inter typography, a navy and blue color palette, custom KPI cards, and Material Symbols icons.
-- Created application documentation covering architecture, page functionality, data integration, execution, and methodological limitations.
-
-**Application pages:**
-
-| Page | Primary functionality |
-|---|---|
-| Executive Overview | Customer metrics, revenue distribution, RFM performance, and business observations |
-| Customer Segmentation | RFM analysis, customer exploration, and K-Means clustering |
-| Repeat-Purchase Prediction | Model performance, threshold analysis, confusion matrix, and customer predictions |
-| Retention Prioritization | Priority groups, historical monetary-value distribution, scenarios, and customer exploration |
-
-**Application architecture:**
-
-- `app/Home.py` — central navigation controller.
-- `app/pages/` — four analytical application pages.
-- `app/components/metrics.py` — reusable KPI card component.
-- `app/components/charts.py` — shared Plotly chart styling and color mappings.
-- `app/utils/data_loader.py` — processed dataset loading and caching.
-- `app/utils/data_validation.py` — dataset availability and structure validation.
-- `app/utils/model_loader.py` — selected model loading and caching.
-
-**Key outputs:**
-
-- `app/Home.py`
-- `app/pages/`
-- `app/components/`
-- `app/utils/`
-- `.streamlit/config.toml`
-- `docs/streamlit_application.md`
-
-**Running the application:**
-
-Activate the project environment and execute the following command from the repository root:
-
-```powershell
-python -s -m streamlit run app/Home.py
-```
-
-The application requires the processed analytical datasets and selected model artifact to be available locally.
-
-Documentation: `docs/streamlit_application.md`
-
-### Upcoming Phases
-
-| Phase | Focus | Status |
+| Phase | Description | Status |
 |---|---|---|
-| 12 | Testing, Refactoring & Documentation | Next |
+| 1 | Business Understanding & Problem Formulation | Completed |
+| 2 | Dataset Acquisition & Feasibility Assessment | Completed |
+| 3 | Data Quality Assessment, Cleaning & ETL Preparation | Completed |
+| 4 | Database Engineering & SQL Analytics | Completed |
+| 5 | Exploratory Data Analysis | Completed |
+| 6 | Customer Analytics & Segmentation | Completed |
+| 7 | Feature Engineering & Target Construction | Completed |
+| 8 | Predictive Model Development | Completed |
+| 9 | Model Evaluation & Explainability | Completed |
+| 10 | Business Impact & Retention Prioritization | Completed |
+| 11 | Streamlit Application | Completed |
+| 12 | Testing, Refactoring & Documentation | In Progress |
 | 13 | Final Portfolio Presentation | Planned |
 
-## Important Analytical Considerations
+## References
 
-This project investigates behavioral purchase inactivity and repeat-purchase propensity, not subscription cancellation or permanent customer churn.
+Chen, D. (2012). *Online Retail II*. UCI Machine Learning Repository.
 
-The dataset does not contain explicit churn labels, customer demographics, product costs, profit margins, or retention campaign costs.
+https://doi.org/10.24432/C5CG6D
 
-Consequently:
+Dataset license: Creative Commons Attribution 4.0 International (CC BY 4.0).
 
-- Inactivity must be defined using an explicit observation window.
-- Predictive labels must account for the dataset's temporal coverage.
-- The repeat-purchase target represents future purchasing behavior within a defined 90-day window, not permanent customer retention or churn.
-- Historical revenue must not be interpreted as profit or customer lifetime value.
-- Predictive associations must not be interpreted as causal relationships.
-- Cancellation records must not automatically be treated as confirmed matches to original purchases.
-- Gross qualifying purchase revenue does not automatically account for cancellations.
-- Temporal variation in purchasing behavior must be considered when evaluating predictive performance.
-- Test-set performance has been evaluated, but it does not establish production readiness or performance on entirely unseen customers.
-- Test calibration indicated systematic underestimation of observed repeat-purchase rates; predicted probabilities should therefore be interpreted cautiously.
-- Retention return on investment cannot be established without additional cost, margin, and intervention-effectiveness information.
-- Classification thresholds should not be treated as financially optimal without evidence about intervention costs and business outcomes.
+---
 
-These limitations are considered throughout the analytical workflow.
+**Author:** Hizkia Febrian
 
-## Repository and Data Policy
-
-Source code, notebooks, documentation, and reference files are maintained in Git.
-
-Raw and processed datasets are excluded from version control because of their size and data management considerations. The original dataset can be obtained from the official UCI repository. Processed analytical datasets and modeling outputs can be reproduced by running the relevant notebooks and scripts.
-
-## Author
-
-Developed as an independent data science portfolio project.
+**Repository:** [customer-intelligence-revenue-optimization](https://github.com/hizkiafebrian98/customer-intelligence-revenue-optimization)

@@ -23,12 +23,15 @@ RFM_SEGMENT_COLORS = {
     "Other customers": "#56B4E9",
 }
 
+
+# Retention priority colors
 PRIORITY_COLORS = {
     "P1": "#D55E00",
     "P2": "#0072B2",
     "P3": "#E69F00",
     "P4": "#009E73",
 }
+
 
 def apply_chart_theme(fig):
     """Apply the shared Enterprise Blue theme to a Plotly figure."""
@@ -66,17 +69,24 @@ def apply_chart_theme(fig):
     for trace in fig.data:
 
         if trace.type == "bar":
-            trace.marker.color = CHART_COLORS[
-                bar_index % len(CHART_COLORS)
-            ]
-            bar_index += 1
+
+            if trace.name in PRIORITY_COLORS:
+                trace.marker.color = PRIORITY_COLORS[trace.name]
+
+            else:
+                trace.marker.color = CHART_COLORS[
+                    bar_index % len(CHART_COLORS)
+                ]
+                bar_index += 1
 
         elif trace.type == "histogram":
             trace.marker.color = CHART_COLORS[0]
 
         elif trace.type in ["scatter", "scattergl"]:
+
             if trace.name in RFM_SEGMENT_COLORS:
                 trace.marker.color = RFM_SEGMENT_COLORS[trace.name]
+
             else:
                 trace.marker.color = CHART_COLORS[0]
 

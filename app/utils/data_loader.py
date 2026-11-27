@@ -19,17 +19,56 @@ from app.utils.data_validation import (
 )
 
 
+def _load_dataset(
+    path,
+    label,
+    required_columns,
+    file_format="parquet",
+):
+    """Load and validate a required application dataset."""
 
-@st.cache_data
-def load_customer_analytics():
-    path = CUSTOMER_ANALYTICS_PATH
-    validate_file_exists(path, "Customer analytics")
+    validate_file_exists(path, label)
 
-    df = pd.read_parquet(path)
+    try:
+        if file_format == "parquet":
+            df = pd.read_parquet(path)
+
+        elif file_format == "csv":
+            df = pd.read_csv(path)
+
+        else:
+            raise ValueError(
+                f"Unsupported dataset format: {file_format}"
+            )
+
+    except (OSError, ValueError, ImportError) as error:
+        st.error(
+            f"Unable to load dataset: {label}\n\n"
+            f"File location: {path}\n\n"
+            f"Details: {error}"
+        )
+        st.stop()
 
     validate_columns(
         df,
-        [
+        required_columns,
+        label,
+    )
+
+    validate_non_empty(
+        df,
+        label,
+    )
+
+    return df
+
+
+@st.cache_data
+def load_customer_analytics():
+    return _load_dataset(
+        path=CUSTOMER_ANALYTICS_PATH,
+        label="Customer analytics",
+        required_columns=[
             "Customer ID",
             "recency",
             "frequency",
@@ -37,23 +76,15 @@ def load_customer_analytics():
             "rfm_segment",
             "cancellation_value",
         ],
-        "Customer analytics",
     )
-
-    validate_non_empty(df, "Customer analytics")
-    return df
 
 
 @st.cache_data
 def load_purchase_propensity_dataset():
-    path = PURCHASE_PROPENSITY_PATH
-    validate_file_exists(path, "Purchase propensity")
-
-    df = pd.read_parquet(path)
-
-    validate_columns(
-        df,
-        [
+    return _load_dataset(
+        path=PURCHASE_PROPENSITY_PATH,
+        label="Purchase propensity",
+        required_columns=[
             "Customer ID",
             "snapshot_date",
             "recency_days",
@@ -64,23 +95,15 @@ def load_purchase_propensity_dataset():
             "repeat_purchase_90d",
             "partition",
         ],
-        "Purchase propensity",
     )
-
-    validate_non_empty(df, "Purchase propensity")
-    return df
 
 
 @st.cache_data
 def load_retention_priorities():
-    path = RETENTION_PRIORITIES_PATH
-    validate_file_exists(path, "Retention priorities")
-
-    df = pd.read_parquet(path)
-
-    validate_columns(
-        df,
-        [
+    return _load_dataset(
+        path=RETENTION_PRIORITIES_PATH,
+        label="Retention priorities",
+        required_columns=[
             "Customer ID",
             "snapshot_date",
             "historical_monetary",
@@ -88,87 +111,58 @@ def load_retention_priorities():
             "repeat_purchase_90d",
             "priority_segment",
         ],
-        "Retention priorities",
     )
-
-    validate_non_empty(df, "Retention priorities")
-    return df
 
 
 @st.cache_data
 def load_rfm_segment_profile():
-    path = RFM_SEGMENT_PROFILE_PATH
-    validate_file_exists(path, "RFM segment profile")
-
-    df = pd.read_csv(path)
-
-    validate_columns(
-        df,
-        [
+    return _load_dataset(
+        path=RFM_SEGMENT_PROFILE_PATH,
+        label="RFM segment profile",
+        required_columns=[
             "rfm_segment",
             "customers",
             "total_purchase_value",
             "total_cancellation_value",
         ],
-        "RFM segment profile",
+        file_format="csv",
     )
-
-    validate_non_empty(df, "RFM segment profile")
-    return df
 
 
 @st.cache_data
 def load_kmeans_cluster_profile():
-    path = KMEANS_CLUSTER_PROFILE_PATH
-    validate_file_exists(path, "K-Means cluster profile")
-
-    df = pd.read_csv(path)
-
-    validate_columns(
-        df,
-        [
+    return _load_dataset(
+        path=KMEANS_CLUSTER_PROFILE_PATH,
+        label="K-Means cluster profile",
+        required_columns=[
             "kmeans_cluster",
             "customers",
             "total_purchase_value",
         ],
-        "K-Means cluster profile",
+        file_format="csv",
     )
-
-    validate_non_empty(df, "K-Means cluster profile")
-    return df
 
 
 @st.cache_data
 def load_rfm_cancellation_concentration():
-    path = RFM_CANCELLATION_PATH
-    validate_file_exists(path, "RFM cancellation concentration")
-
-    df = pd.read_csv(path)
-
-    validate_columns(
-        df,
-        [
+    return _load_dataset(
+        path=RFM_CANCELLATION_PATH,
+        label="RFM cancellation concentration",
+        required_columns=[
             "rfm_segment",
             "customers",
             "customers_with_cancellations",
         ],
-        "RFM cancellation concentration",
+        file_format="csv",
     )
-
-    validate_non_empty(df, "RFM cancellation concentration")
-    return df
 
 
 @st.cache_data
 def load_top_cancellation_customers():
-    path = TOP_CANCELLATION_CUSTOMERS_PATH
-    validate_file_exists(path, "Top cancellation customers")
-
-    df = pd.read_csv(path)
-
-    validate_columns(
-        df,
-        [
+    return _load_dataset(
+        path=TOP_CANCELLATION_CUSTOMERS_PATH,
+        label="Top cancellation customers",
+        required_columns=[
             "Customer ID",
             "rfm_segment",
             "recency",
@@ -176,8 +170,5 @@ def load_top_cancellation_customers():
             "monetary",
             "cancellation_value",
         ],
-        "Top cancellation customers",
+        file_format="csv",
     )
-
-    validate_non_empty(df, "Top cancellation customers")
-    return df

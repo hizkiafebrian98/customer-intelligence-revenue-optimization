@@ -95,10 +95,25 @@ selected_priority = st.selectbox(
 
 if selected_priority == "All Groups":
     filtered_customers = customers.copy()
+
+    st.info(
+        "Select an individual priority group to view its "
+        "description and recommended engagement approach."
+    )
+
 else:
     filtered_customers = customers.loc[
         customers["priority_segment"] == selected_priority
     ].copy()
+
+    st.markdown(
+        f"**{selected_priority} — "
+        f"{priority_descriptions[selected_priority]}**"
+    )
+
+    st.caption(
+        f"Suggested approach: {priority_actions[selected_priority]}"
+    )
 
 
 # Selected group metrics
@@ -127,11 +142,17 @@ display_metric_row([
     },
     {
         "label": "Mean Predicted Probability",
-        "value": f"{group_probability:.2%}",
+        "value": (
+            f"{group_probability:.2%}"
+            if group_count > 0 else "N/A"
+        ),
     },
     {
         "label": "Actual Repeat-Purchase Rate",
-        "value": f"{group_repeat_rate:.2%}",
+        "value": (
+            f"{group_repeat_rate:.2%}"
+            if group_count > 0 else "N/A"
+        ),
     },
 ])
 
@@ -329,53 +350,61 @@ st.markdown(
     "Explore individual customers and their historical prioritization metrics."
 )
 
-display_df = filtered_customers[
-    [
-        "Customer ID",
-        "snapshot_date",
-        "recency_days",
-        "historical_monetary",
-        "predicted_probability",
-        "repeat_purchase_90d",
-        "priority_segment",
-    ]
-].copy()
+if filtered_customers.empty:
 
-display_df["Customer ID"] = (
-    display_df["Customer ID"].astype("Int64")
-)
+    st.info(
+        "No customers match the selected priority group."
+    )
 
-st.dataframe(
-    display_df.sort_values(
-        "predicted_probability",
-        ascending=True,
-    ),
-    use_container_width=True,
-    hide_index=True,
-    column_config={
-        "Customer ID": st.column_config.NumberColumn(
+else:
+
+    display_df = filtered_customers[
+        [
             "Customer ID",
-            format="%d",
+            "snapshot_date",
+            "recency_days",
+            "historical_monetary",
+            "predicted_probability",
+            "repeat_purchase_90d",
+            "priority_segment",
+        ]
+    ].copy()
+
+    display_df["Customer ID"] = (
+        display_df["Customer ID"].astype("Int64")
+    )
+
+    st.dataframe(
+        display_df.sort_values(
+            "predicted_probability",
+            ascending=True,
         ),
-        "snapshot_date": st.column_config.DateColumn(
-            "Snapshot Date"
-        ),
-        "recency_days": st.column_config.NumberColumn(
-            "Recency (days)",
-            format="%d",
-        ),
-        "historical_monetary": st.column_config.NumberColumn(
-            "Historical Purchase Value",
-            format="£%.2f",
-        ),
-        "predicted_probability": st.column_config.NumberColumn(
-            "Predicted Repeat-Purchase Probability",
-            format="percent",
-        ),
-        "repeat_purchase_90d": "Actual Repeat-Purchase Outcome",
-        "priority_segment": "Priority Group",
-    },
-)
+        use_container_width=True,
+        hide_index=True,
+        column_config={
+            "Customer ID": st.column_config.NumberColumn(
+                "Customer ID",
+                format="%d",
+            ),
+            "snapshot_date": st.column_config.DateColumn(
+                "Snapshot Date"
+            ),
+            "recency_days": st.column_config.NumberColumn(
+                "Recency (days)",
+                format="%d",
+            ),
+            "historical_monetary": st.column_config.NumberColumn(
+                "Historical Purchase Value",
+                format="£%.2f",
+            ),
+            "predicted_probability": st.column_config.NumberColumn(
+                "Predicted Repeat-Purchase Probability",
+                format="percent",
+            ),
+            "repeat_purchase_90d": "Actual Repeat-Purchase Outcome",
+            "priority_segment": "Priority Group",
+        },
+    )
 
 
 st.caption(
