@@ -39,3 +39,6 @@ data/processed/*
 # OS
 .DS_Store
 Thumbs.db
+
+# Notebook-generated data
+notebooks/data/processed/

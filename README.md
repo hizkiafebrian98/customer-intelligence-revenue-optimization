@@ -23,7 +23,7 @@ The project combines data engineering, exploratory data analysis, customer analy
 **UCI Online Retail II**
 
 - Source: [UCI Machine Learning Repository](https://archive.ics.uci.edu/dataset/502/online+retail+ii)
-- Citation: Chen, D. (2012). *Online Retail II* [Dataset]. UCI Machine Learning Repository. https://doi.org/10.24432/C5CG6H.
+- Citation: Chen, D. (2012). *Online Retail II* [Dataset]. UCI Machine Learning Repository. https://doi.org/10.24432/C5CG6D.
 - License: CC BY 4.0
 - Original records: 1,067,371 transaction line items
 - Original columns: 8
@@ -62,7 +62,8 @@ customer-intelligence-revenue-optimization/
 │   ├── 01_data_understanding.ipynb
 │   ├── 02_data_quality_assessment.ipynb
 │   ├── 03_database_integration.ipynb
-│   └── 04_exploratory_data_analysis.ipynb
+│   ├── 04_exploratory_data_analysis.ipynb
+│   └── 05_customer_analytics_and_segmentation.ipynb
 ├── sql/
 │   ├── schema.sql
 │   ├── data_quality.sql
@@ -80,7 +81,8 @@ customer-intelligence-revenue-optimization/
 │   ├── dataset_feasibility_assessment.md
 │   ├── data_cleaning_and_etl.md
 │   ├── database_engineering_and_sql_analytics.md
-│   └── exploratory_data_analysis.md
+│   ├── exploratory_data_analysis.md
+│   └── customer_analytics_and_segmentation.md
 ├── requirements.txt
 ├── pyproject.toml
 └── README.md
@@ -160,12 +162,56 @@ Key accomplishments:
 
 Documentation: `docs/exploratory_data_analysis.md`
 
+### Phase 6 — Customer Analytics & Segmentation
+
+**Status: Completed**
+
+Constructed a customer-level analytical dataset containing 5,852 identified customers with at least one qualifying purchase.
+
+Key accomplishments:
+
+- Defined customer-level analytical metrics, including Recency, Frequency, and Monetary value (RFM).
+- Analyzed customer purchasing behavior, frequency distributions, and revenue concentration.
+- Examined customer cancellation activity separately from qualifying purchases.
+- Developed six rule-based RFM segments:
+  - Champions
+  - Loyal customers
+  - Recent high-value
+  - At-risk valuable
+  - Hibernating
+  - Other customers
+- Applied K-Means clustering using transformed purchasing frequency and monetary values, alongside recency.
+- Evaluated candidate cluster counts using inertia and silhouette scores.
+- Selected a four-cluster solution based on a practical balance between cluster separation and business interpretability.
+- Compared RFM and K-Means segmentation results using Adjusted Rand Index and Normalized Mutual Information.
+- Developed segment profiles and preliminary retention prioritization recommendations.
+
+**Selected findings:**
+
+- The top 10% of customers contributed 63.90% of qualifying purchase revenue.
+- Customers with nine or more purchase invoices contributed 69.84% of qualifying purchase revenue.
+- RFM Champions represented 21.43% of customers and contributed 67.71% of qualifying purchase revenue.
+- The highest-value K-Means cluster represented 15.99% of customers and contributed 70.83% of qualifying purchase revenue.
+- RFM and K-Means produced partially overlapping but distinct customer groupings.
+
+Cancellation activity was examined as supplementary customer behavior. Cancellation-to-purchase-value ratios are descriptive indicators and should not be interpreted as verified return rates.
+
+**Key outputs:**
+
+- `notebooks/05_customer_analytics_and_segmentation.ipynb`
+- `data/processed/customer_analytics.parquet`
+- `data/processed/rfm_segment_profile.csv`
+- `data/processed/kmeans_cluster_profile.csv`
+- `data/processed/rfm_cancellation_concentration.csv`
+- `data/processed/top_cancellation_customers_by_rfm.csv`
+
+Documentation: `docs/customer_analytics_and_segmentation.md`
+
 ### Upcoming Phases
 
 | Phase | Focus | Status |
 |---|---|---|
-| 6 | Customer Analytics & Segmentation | Next |
-| 7 | Feature Engineering & Target Construction | Planned |
+| 7 | Feature Engineering & Target Construction | Next |
 | 8 | Predictive Model Development | Planned |
 | 9 | Model Evaluation & Explainability | Planned |
 | 10 | Business Impact & Retention Prioritization | Planned |
@@ -185,6 +231,7 @@ Consequently:
 - Predictive labels must account for the dataset's temporal coverage.
 - Historical revenue must not be interpreted as profit.
 - Predictive associations must not be interpreted as causal relationships.
+- Cancellation records must not automatically be treated as confirmed matches to original purchases.
 - Retention return on investment cannot be established without additional cost and margin assumptions.
 
 These limitations will be addressed throughout the analytical workflow.
