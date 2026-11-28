@@ -2,7 +2,7 @@
 import pandas as pd
 import streamlit as st
 
-from app.config import (
+from config import (
     CUSTOMER_ANALYTICS_PATH,
     PURCHASE_PROPENSITY_PATH,
     RETENTION_PRIORITIES_PATH,

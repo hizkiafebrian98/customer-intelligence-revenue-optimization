@@ -15,7 +15,7 @@ from utils.data_loader import load_purchase_propensity_dataset
 from app.components.metrics import display_metric_row
 from app.components.charts import apply_chart_theme
 
-from app.config import FEATURES, TARGET
+from config import FEATURES, TARGET
 
 
 

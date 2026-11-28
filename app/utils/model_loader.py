@@ -1,7 +1,7 @@
 import joblib
 import streamlit as st
 
-from app.config import MODEL_PATH
+from config import MODEL_PATH
 from app.utils.data_validation import validate_file_exists
 
 
