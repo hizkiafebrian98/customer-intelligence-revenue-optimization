@@ -295,7 +295,7 @@ For readers interested in the full technical process, analytical decisions, impl
 
 ## Author
 
-**Hizkia Febrian**
+**Hizkia Febrian Gultom**
 
 Data Science Portfolio Project
 
