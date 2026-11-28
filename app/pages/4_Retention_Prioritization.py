@@ -5,8 +5,8 @@ import pandas as pd
 
 from utils.data_loader import load_retention_priorities
 
-from app.components.metrics import display_metric_row
-from app.components.charts import (
+from components.metrics import display_metric_row
+from components.charts import (
     apply_chart_theme,
     PRIORITY_COLORS,
 )

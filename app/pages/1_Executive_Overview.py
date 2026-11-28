@@ -7,8 +7,8 @@ from utils.data_loader import (
     load_rfm_segment_profile,
 )
 
-from app.components.metrics import display_metric_row
-from app.components.charts import apply_chart_theme
+from components.metrics import display_metric_row
+from components.charts import apply_chart_theme
 
 
 # --------------------------------------------------

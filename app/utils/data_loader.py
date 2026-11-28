@@ -12,7 +12,7 @@ from config import (
     TOP_CANCELLATION_CUSTOMERS_PATH,
 )
 
-from app.utils.data_validation import (
+from utils.data_validation import (
     validate_file_exists,
     validate_columns,
     validate_non_empty,

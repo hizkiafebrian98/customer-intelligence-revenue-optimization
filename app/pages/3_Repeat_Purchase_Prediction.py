@@ -1,4 +1,4 @@
-from app.utils.model_loader import load_selected_model
+from utils.model_loader import load_selected_model
 
 import pandas as pd
 import plotly.express as px
@@ -12,8 +12,8 @@ from sklearn.metrics import (
 
 from utils.data_loader import load_purchase_propensity_dataset
 
-from app.components.metrics import display_metric_row
-from app.components.charts import apply_chart_theme
+from components.metrics import display_metric_row
+from components.charts import apply_chart_theme
 
 from config import FEATURES, TARGET
 

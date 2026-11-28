@@ -2,7 +2,7 @@ import joblib
 import streamlit as st
 
 from config import MODEL_PATH
-from app.utils.data_validation import validate_file_exists
+from utils.data_validation import validate_file_exists
 
 
 @st.cache_resource

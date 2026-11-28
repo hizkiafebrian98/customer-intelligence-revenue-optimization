@@ -8,8 +8,8 @@ from utils.data_loader import (
     load_kmeans_cluster_profile,
 )
 
-from app.components.metrics import display_metric_row
-from app.components.charts import apply_chart_theme
+from components.metrics import display_metric_row
+from components.charts import apply_chart_theme
 
 
 # Load datasets
