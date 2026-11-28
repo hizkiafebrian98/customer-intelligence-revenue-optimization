@@ -17,6 +17,13 @@ data/raw/*
 
 data/processed/*
 !data/processed/.gitkeep
+!data/processed/customer_analytics.parquet
+!data/processed/customer_purchase_propensity_dataset.parquet
+!data/processed/retention_priorities.parquet
+!data/processed/rfm_segment_profile.csv
+!data/processed/kmeans_cluster_profile.csv
+!data/processed/rfm_cancellation_concentration.csv
+!data/processed/top_cancellation_customers_by_rfm.csv
 
 # Environment variables and credentials
 .env

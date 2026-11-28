@@ -1,0 +1,7 @@
+rfm_segment,customers,customers_with_cancellations,median_customer_cancellation_value,median_cancellation_ratio,customers_ratio_over_10pct,customers_ratio_over_25pct,customers_ratio_over_50pct
+At-risk valuable,782,397,1.8,0.002,72,23,5
+Champions,1254,961,39.255,0.009,48,7,2
+Hibernating,1352,197,0.0,0.0,87,33,16
+Loyal customers,603,356,9.9,0.005,23,4,1
+Other customers,1693,435,0.0,0.0,65,26,13
+Recent high-value,168,77,0.0,0.0,5,3,2

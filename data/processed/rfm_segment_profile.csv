@@ -1,0 +1,7 @@
+rfm_segment,customers,customers_with_cancellations,total_purchase_value,total_cancellation_value,total_cancellation_lines,total_cancellation_invoices,median_recency,median_frequency,median_monetary,cancellation_incidence_pct,cancellation_value_to_purchase_pct,cancellation_lines_per_affected_customer
+At-risk valuable,782,397,1698154.2,163188.5,2021,869,372.5,4.0,1216.32,50.77,9.61,5.09
+Champions,1254,961,11555689.88,302343.44,11220,4551,17.0,11.0,3968.39,76.63,2.62,11.68
+Hibernating,1352,197,347790.42,8048.9,555,231,435.0,1.0,235.82,14.57,2.31,2.82
+Loyal customers,603,356,1742374.26,33361.1,1946,873,79.0,7.0,1906.07,59.04,1.91,5.47
+Other customers,1693,435,1193565.52,25002.6,1488,630,65.0,2.0,606.02,25.69,2.09,3.42
+Recent high-value,168,77,529704.44,184542.79,283,119,23.5,3.0,1540.64,45.83,34.84,3.68

@@ -1,0 +1,5 @@
+kmeans_cluster,customers,customers_with_cancellations,total_purchase_value,total_cancellation_value,total_cancellation_lines,total_cancellation_invoices,median_recency,median_frequency,median_monetary,cancellation_incidence_pct,cancellation_value_to_purchase_pct,cancellation_lines_per_affected_customer
+0,936,806,12089050.64,590878.17,11063,4445,18.0,15.0,6135.5,86.11,4.89,13.73
+1,1635,365,845446.61,25799.43,1148,506,458.0,1.0,330.12,22.32,3.05,3.15
+2,1871,1001,3533972.02,86122.04,4431,2017,57.0,5.0,1572.55,53.5,2.44,4.43
+3,1410,251,598809.47,13687.69,871,305,71.0,2.0,372.51,17.8,2.29,3.47
